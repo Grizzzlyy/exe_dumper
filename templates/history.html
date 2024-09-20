@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Report Details{% endblock %}
+
+{% block content %}
+    <h2>Report for {{ report.filename }}</h2>
+
+    <div class="report-layout">
+        <!-- Left Box with File Parameters -->
+        <div class="left-box">
+            <h3>File Parameters</h3>
+            <table>
+                <tr><th>Parameter</th><th>Value</th></tr>
+                <tr><td>Filename</td><td>{{ report.filename }}</td></tr>
+                <tr><td>Filesize</td><td>{{ report.filesize }}</td></tr>
+                <tr><td>MD5 Hash</td><td>{{ report.md5 }}</td></tr>
+                <tr><td>SHA256 Hash</td><td>{{ report.sha256 }}</td></tr>
+                <tr><td>Upload Time</td><td>{{ report.upload_time }}</td></tr>
+            </table>
+        </div>
+
+        <!-- Right Box with Links to Parent/Child Files -->
+        <div class="right-box">
+            <h3>Related Files</h3>
+            <ul>
+                {% for parent in report.parents %}
+                    <li><a href="{{ url_for('report', report_id=parent.id) }}">Parent: {{ parent.filename }}</a></li>
+                {% endfor %}
+                {% for child in report.children %}
+                    <li><a href="{{ url_for('report', report_id=child.id) }}">Child: {{ child.filename }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- YARA Rules Table -->
+        <div class="yara-rules">
+            <h3>YARA Rules</h3>
+            <table>
+                <tr><th>Rule Name</th><th>Status</th></tr>
+                {% for rule in report.yara_rules %}
+                <tr>
+                    <td><a href="{{ url_for('yara_rule', rule_id=rule.id) }}">{{ rule.name }}</a></td>
+                    <td>{{ 'Activated' if rule.activated else 'Not Activated' }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endblock %}
