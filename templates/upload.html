@@ -1,10 +1,10 @@
-{% extends "base.html" %}
+{% extends "base_nav.html" %}
 
 {% block title %}Upload File{% endblock %}
 
 {% block content %}
     <h2>Upload a Binary File</h2>
-    <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data">
         <input type="file" name="file" required>
         <button type="submit">Upload</button>
     </form>

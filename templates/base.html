@@ -7,19 +7,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+
     <nav>
-        <ul>
-            <li><a href="{{ url_for('history') }}">History</a></li>
-            <li><a href="{{ url_for('upload') }}">Upload</a></li>
-            {% if current_user.is_authenticated %}
-                {% if current_user.is_admin %}
-                    <li><a href="{{ url_for('admin_panel') }}">Admin Panel</a></li>
-                {% endif %}
-                <li class="right"><a href="{{ url_for('logout') }}">Logout</a></li>
-            {% else %}
-                <li class="right"><a href="{{ url_for('login') }}">Login</a></li>
-            {% endif %}
-        </ul>
+        {% block nav %}{% endblock %}
     </nav>
 
     <div class="content">
