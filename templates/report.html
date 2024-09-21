@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Analysis Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .file-info, .relations, .yara-rules {
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row">
+        <!-- File Info -->
+        <div class="col-md-6 file-info">
+            <h4 class="section-title">File Info</h4>
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <td>Filename</td>
+                    <td>
+                        <a href="{{ report.file_link }}" target="_blank">{{ report.filename }}</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Type</td>
+                    <td>{{ report.type }}</td>
+                </tr>
+                <tr>
+                    <td>Size</td>
+                    <td>{{ report.size }}</td>
+                </tr>
+                <tr>
+                    <td>MD5</td>
+                    <td>{{ report.md5 }}</td>
+                </tr>
+                <tr>
+                    <td>SHA1</td>
+                    <td>{{ report.sha1 }}</td>
+                </tr>
+                <tr>
+                    <td>SHA256</td>
+                    <td>{{ report.sha256 }}</td>
+                </tr>
+                <tr>
+                    <td>SHA512</td>
+                    <td>{{ report.sha512 }}</td>
+                </tr>
+                <tr>
+                    <td>CRC32</td>
+                    <td>{{ report.crc32 }}</td>
+                </tr>
+                <tr>
+                    <td>SSDEEP</td>
+                    <td>{{ report.ssdeep }}</td>
+                </tr>
+                <tr>
+                    <td>Upload Time</td>
+                    <td>{{ report.upload_time }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Children/Parents -->
+        <div class="col-md-6 relations">
+            <h4 class="section-title">Children/Parents</h4>
+            {% if report.children %}
+            <h5>Children:</h5>
+            <ul>
+                {% for child_id in report.children %}
+                <li><a href="{{ url_for('show_report', report_id=child_id) }}">{{ child_id }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% if report.parents %}
+            <h5>Parents:</h5>
+            <ul>
+                {% for parent_id in report.parents %}
+                <li><a href="{{ url_for('show_report', report_id=parent_id) }}">{{ parent_id }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- YARA Rules -->
+        <div class="col-md-6 yara-rules">
+            <h4 class="section-title">YARA Rules</h4>
+            <ul>
+                {% for rule_id in report.yara_matches %}
+                <li><a href="{{ url_for('static', filename='yara/' + rule_id + '.yara') }}">{{ rule_id }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>

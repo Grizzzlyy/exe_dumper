@@ -1,5 +1,5 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-from logic.manage_db import get_user_info
+from logic.db_users import get_user_info
 
 
 def is_user_exists(login):

@@ -8,7 +8,9 @@ from functools import wraps
 from dotenv import load_dotenv
 
 from logic.auth import is_user_exists, send_otp_code, check_user_password
-from logic.manage_db import get_user_info, add_user, get_user_email
+from logic.db_users import get_user_info, add_user, get_user_email
+from logic.db_reports import get_report
+from logic.kartonn import create_report
 
 load_dotenv()
 
@@ -34,9 +36,6 @@ class User(UserMixin):
         return self.username
 
 
-
-
-
 @login_manager.user_loader
 def load_user(login):
     user_info = get_user_info(login)
@@ -45,6 +44,7 @@ def load_user(login):
     else:
         return User(user_info["username"], user_info["email"], user_info["has_access"],
                     user_info["is_admin"])
+
 
 # If first step of 2FA is completed
 def pwd_correct(f):
@@ -64,6 +64,7 @@ def index():
     if current_user.is_authenticated:
         return redirect(url_for('upload'))
     return redirect(url_for('signin'))
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -168,9 +169,6 @@ def two_factor_auth():
     return render_template('two_factor_auth.html')
 
 
-
-
-
 @app.route('/upload', methods=['GET', 'POST'])
 @login_required
 def upload():
@@ -179,18 +177,18 @@ def upload():
             flash('No file part')
             return redirect(url_for('upload'))
 
-        file = request.files['the_file']
+        file = request.files['file']
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
 
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], current_user.username, filename))
+        
+        report_id = create_report(file)
         flash('File successfully uploaded')
-        return redirect(url_for('upload'))
+        return redirect(url_for('show_report', report_id=report_id))
 
-        f.save(os.path.join(UPLOADS_DIR, current_user.username, )'/var/www/uploads/uploaded_file.txt')
     return render_template('upload.html')
+
 
 @app.route('/logout')
 @login_required
@@ -199,10 +197,18 @@ def logout():
     flash('You have been logged out.')
     return redirect(url_for('signin'))
 
+
 @app.route('/history')
 @login_required
 def history():
     return render_template('upload.html')
+
+
+@app.route('/report/<int:report_id>', methods=['GET', 'POST'])
+@login_required
+def show_report(report_id):
+    report = get_report(current_user.username, report_id)
+    return render_template('report.html', report=report)
 
 
 # @app.route('/signup', methods=['GET', 'POST'])

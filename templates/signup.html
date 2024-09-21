@@ -17,6 +17,9 @@
     <br>
     <button type="submit">Login</button>
 </form>
+
+<p>Already have an account? <a href="{{ url_for('signin') }}">Sign in here</a></p> <!-- Link to signin page -->
+
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <ul>
