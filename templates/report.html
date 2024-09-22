@@ -27,7 +27,7 @@
                 <tr>
                     <td>Filename</td>
                     <td>
-                        <a href="{{ report.file_link }}" target="_blank">{{ report.filename }}</a>
+                        <a href="{{ url_for('get_binary', username=current_user.username ,filename=report.filename) }}" target="_blank">{{ report.filename }}</a>
                     </td>
                 </tr>
                 <tr>

@@ -8,4 +8,14 @@
         <input type="file" name="file" required>
         <button type="submit">Upload</button>
     </form>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
 {% endblock %}
