@@ -8,6 +8,10 @@ body {
     background-color: #f4f4f4;
 }
 
+h2 {
+    text-align: center; /* Center the text */
+}
+
 .content {
     margin: 20px;
 }
@@ -53,13 +57,15 @@ nav ul .right {
 /* Form Styles */
 form {
     display: block;
-    margin: 20px auto;
-    max-width: 400px;
+    margin: 20px auto; /* Centering the form */
+    max-width: 400px; /* Limit the width of the form */
     padding: 20px;
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
 }
+
 
 form label {
     display: block;
@@ -68,7 +74,8 @@ form label {
 }
 
 form input {
-    width: 100%;
+    box-sizing: border-box;
+    width: 100%; /* Full width */
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ddd;
@@ -76,4 +83,63 @@ form input {
 }
 
 form button {
-    width:
+    width: 100%; /* Full width button */
+    padding: 10px; /* Add padding for comfort */
+    background-color: #333; /* Button background */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer on hover */
+}
+
+form button:hover {
+    background-color: #575757; /* Darker on hover */
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+table th, table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #333;
+}
+
+table td {
+    background-color: #fafafa;
+}
+
+table tr:nth-child(even) td {
+    background-color: #f9f9f9;
+}
+
+table tr:hover td {
+    background-color: #f1f1f1;
+}
+
+table a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+table a:hover {
+    text-decoration: underline;
+}
+
+.signin-container h2,
+.signin-container p {
+    text-align: center; /* Center the text */
+}
