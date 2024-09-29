@@ -1,32 +1,13 @@
-{% extends "base.html" %}
-
-{% block title %}Two-Factor Authentication{% endblock %}
-
-{% block content %}
-
-<div class="signin-container">
-    <h2>Two-Factor Authentication</h2>
-
-    <form method="POST">
-        <button type="submit" name="send_code">Send Code</button>
-    </form>
-
-    <form method="POST">
-        <label for="code">Enter the 2FA code sent to your email ({{session.get('email')}}):</label>
-        <input type="text" id="code" name="code" required>
-        <br>
-        <button type="submit" name="verify_code">Verify Code</button>
-    </form>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
+<form method="POST">
+    {% if not_set %}
+        <p>Two factor authentication isn't set. Please generate QR code first.</p>
     {% endif %}
-    {% endwith %}
-</div>
-
-{% endblock %}
-
+    <button type="submit" name="generate_qr">Generate QR-code for Google Authenticator</button>
+    <br>
+    {% if qr_code %}
+        <img src="{{ url_for('static', filename=qr_code) }}" alt="QR Code for 2FA">
+    {% endif %}
+    <br>
+    <input type="text" name="code" placeholder="Enter code from Google Authenticator">
+    <button type="submit" name="verify_code">Verify code</button>
+</form>
