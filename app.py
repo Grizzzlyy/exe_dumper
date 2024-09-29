@@ -97,30 +97,20 @@ def signup():
         session["username"] = username
         session["email"] = email
         session["pwd_hash"] = generate_pwd_hash(password)
-        return redirect(url_for('two_factor_auth'))
+        return redirect(url_for('two_fa_set'))
 
     return render_template('signup.html')
 
 
-@app.route('/two_factor_auth', methods=['GET', 'POST'])
+@app.route('/verify_2fa', methods=['POST', 'GET'])
 @pwd_correct
-def two_factor_auth():
+def two_fa_verify():
     if request.method == 'POST':
-        if 'generate_qr' in request.form:
-            username = session.get('username')
-
-            user_key = pyotp.random_base32()
-            session['2fa_key'] = user_key
-
-            qr_code_path = generate_qr_code(user_key, username, 'ExeDumper.ru')
-
-            return render_template('two_factor_auth.html', qr_code=qr_code_path)
-
-        elif 'verify_code' in request.form:
+        if 'verify_code' in request.form:
             code = request.form['code']
             key = session.get('2fa_key')
             if key is None:
-                return render_template('two_factor_auth.html', not_set=True)
+                return redirect(url_for('two_fa_set'))
 
             totp = pyotp.TOTP(key)
 
@@ -135,7 +125,27 @@ def two_factor_auth():
             else:
                 flash('Invalid code. Please try again.')
 
-    return render_template('two_factor_auth.html')
+    return render_template('2fa_verify.html')
+
+@app.route('/set_2fa', methods=['POST', 'GET'])
+@pwd_correct
+def two_fa_set():
+    if request.method == 'POST':
+        if 'generate_qr' in request.form:
+            username = session.get('username')
+
+            user_key = pyotp.random_base32()
+            session['2fa_key'] = user_key
+
+            qr_code_path = generate_qr_code(user_key, username, 'ExeDumper.ru')
+            return render_template('2fa_gen.html', qr_code=qr_code_path)
+
+        if 'verify_code' in request.form:
+            username = session.get('username')
+            os.remove(f"static/tmp/{username}_qr.png")
+            return redirect(url_for('two_fa_verify'))
+
+    return render_template('2fa_gen.html')
 
 
 @app.route('/signin', methods=['GET', 'POST'])
@@ -153,7 +163,9 @@ def signin():
                 session["email"] = user_info["email"]
                 session["2fa_key"] = user_info["2fa_key"]
 
-                return redirect(url_for('two_factor_auth'))
+                if session.get("2fa_key") is None:
+                    return redirect(url_for('two_fa_set'))
+                return redirect(url_for('two_fa_verify'))
             else:
                 flash('Invalid login or password. Please try again.')
 

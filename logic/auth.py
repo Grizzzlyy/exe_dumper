@@ -47,6 +47,6 @@ def generate_qr_code(key, account_name, issuer_name):
 
     # Генерация изображения QR-кода.
     img = qr.make_image()
-    img.save(f'static/{account_name}_qr.png')
+    img.save(f'static/tmp/{account_name}_qr.png')
 
-    return f'{account_name}_qr.png'
+    return f'tmp/{account_name}_qr.png'
