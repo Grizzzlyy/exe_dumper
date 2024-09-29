@@ -42,7 +42,7 @@ def get_file_type(file_path):
 
 def add_file(file_path):
     logging.basicConfig(
-        filename='file_processing.log',
+        filename='BD/file_processing.log',
         level=logging.INFO,               
         format='%(asctime)s - %(levelname)s - %(message)s')
     try:
