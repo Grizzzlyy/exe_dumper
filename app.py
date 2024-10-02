@@ -1,16 +1,14 @@
 import os
-
-from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from functools import wraps
+
 from dotenv import load_dotenv
+from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory
+from flask_login import LoginManager, UserMixin, login_required, logout_user, current_user, login_user
 
-from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, generate_qr_code
-from logic.db_users import get_user_info, add_user
+from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, send_otp_code
 from logic.db_reports import get_report
+from logic.db_users import get_user_info, add_user
 from logic.kartonn import create_report
-
-import pyotp
 
 load_dotenv()
 
@@ -97,55 +95,41 @@ def signup():
         session["username"] = username
         session["email"] = email
         session["pwd_hash"] = generate_pwd_hash(password)
-        return redirect(url_for('two_fa_set'))
+        session["code_sent"] = False
+        return redirect(url_for('check_mail_code'))
 
     return render_template('signup.html')
 
 
-@app.route('/verify_2fa', methods=['POST', 'GET'])
+# Right after signup
+@app.route('/verify', methods=['GET', 'POST'])
 @pwd_correct
-def two_fa_verify():
+def check_mail_code():
+    if not session.get('code_sent'):
+        session['otp_code_hash'] = send_otp_code(session.get('email'))
+        session['code_sent'] = True
+
     if request.method == 'POST':
-        if 'verify_code' in request.form:
+        if 'send_code' in request.form:
+            session['otp_code_hash'] = send_otp_code(session.get('email'))
+        elif 'verify_code' in request.form:
             code = request.form['code']
-            key = session.get('2fa_key')
-            if key is None:
-                return redirect(url_for('two_fa_set'))
+            code_hash = session.get('otp_code_hash')
 
-            totp = pyotp.TOTP(key)
-
-            if totp.verify(code):
-                if get_user_info(session.get('username')) is None:
+            if check_pwd_hash(code_hash, code):
+                if not is_user_exists(session.get('username')):
+                    # Add user to database
                     user = {"username": session.get('username'), "email": session.get('email'),
-                            "pwd_hash": session.get('pwd_hash'), "has_access": True, "is_admin": False, "2fa_key": session.get('2fa_key')}
+                            "pwd_hash": session.get('pwd_hash'), "has_access": True, "is_admin": False}
                     add_user(user)
+
                 user = User(session.get('username'), session.get('email'), has_access=True, is_admin=False)
                 login_user(user)
                 return redirect(url_for('index'))
             else:
                 flash('Invalid code. Please try again.')
 
-    return render_template('2fa_verify.html')
-
-@app.route('/set_2fa', methods=['POST', 'GET'])
-@pwd_correct
-def two_fa_set():
-    if request.method == 'POST':
-        if 'generate_qr' in request.form:
-            username = session.get('username')
-
-            user_key = pyotp.random_base32()
-            session['2fa_key'] = user_key
-
-            qr_code_path = generate_qr_code(user_key, username, 'ExeDumper.ru')
-            return render_template('2fa_gen.html', qr_code=qr_code_path)
-
-        if 'verify_code' in request.form:
-            username = session.get('username')
-            os.remove(f"static/tmp/{username}_qr.png")
-            return redirect(url_for('two_fa_verify'))
-
-    return render_template('2fa_gen.html')
+    return render_template('verification.html')
 
 
 @app.route('/signin', methods=['GET', 'POST'])
@@ -161,11 +145,9 @@ def signin():
                 session["is_pwd_correct"] = True
                 session["username"] = user_info["username"]
                 session["email"] = user_info["email"]
-                session["2fa_key"] = user_info["2fa_key"]
+                session["code_sent"] = False
 
-                if session.get("2fa_key") is None:
-                    return redirect(url_for('two_fa_set'))
-                return redirect(url_for('two_fa_verify'))
+                return redirect(url_for('check_mail_code'))
             else:
                 flash('Invalid login or password. Please try again.')
 

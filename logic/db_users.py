@@ -3,11 +3,11 @@ from logic.utils import login_type
 
 tmp_db = [
     {"username": "alice", "email": "alice@mail.com", "pwd_hash": generate_password_hash('alice'),
-     "has_access": True, "is_admin": True, "2fa_key": None},
+     "has_access": True, "is_admin": True},
     {"username": "bob", "email": "bob@mail.com", "pwd_hash": generate_password_hash('bob'),
-     "has_access": True, "is_admin": False, "2fa_key": None},
+     "has_access": True, "is_admin": False},
     {"username": "clark", "email": "clark@mail.com", "pwd_hash": generate_password_hash('clark'),
-     "has_access": True, "is_admin": False, "2fa_key": None},
+     "has_access": True, "is_admin": False},
 ]
 
 

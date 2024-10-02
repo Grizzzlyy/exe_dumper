@@ -1,9 +1,0 @@
-<form method="POST">
-    <button type="submit" name="generate_qr">Generate QR-code for Google Authenticator</button>
-    {% if qr_code %}
-        <br>
-        <img src="{{ url_for('static', filename=qr_code) }}" alt="QR Code for 2FA">
-        <br>
-        <button type="submit" name="verify_code">Done!</button>
-    {% endif %}
-</form>

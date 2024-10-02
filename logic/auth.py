@@ -1,9 +1,13 @@
+import secrets
+import smtplib
+import string
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+from bs4 import BeautifulSoup as bs
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from logic.db_users import get_user_info
-
-import pyotp
-import qrcode
 
 
 def generate_pwd_hash(password):
@@ -31,22 +35,41 @@ def check_user_password(login, password):
     return check_pwd_hash(user_info["pwd_hash"], password)
 
 
-def generate_qr_code(key, account_name, issuer_name):
-    # Генерация URI для TOTP аутентификации.
-    uri = pyotp.totp.TOTP(key).provisioning_uri(name=account_name, issuer_name=issuer_name)
+def gen_otp(length=6):
+    symbols = string.digits + string.ascii_uppercase
+    otp = ''.join(secrets.choice(symbols) for _ in range(length))
+    return otp
 
-    # Создание QR-кода.
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=2,
-    )
-    qr.add_data(uri)
-    qr.make(fit=True)
 
-    # Генерация изображения QR-кода.
-    img = qr.make_image()
-    img.save(f'static/tmp/{account_name}_qr.png')
+def send_mail(email, FROM, TO, msg):
+    # TODO доставать из БД
+    password = "trwfdogydawefhff"
 
-    return f'tmp/{account_name}_qr.png'
+    server = smtplib.SMTP_SSL("smtp.yandex.ru")
+    server.login(email, password)
+    server.sendmail(FROM, TO, msg.as_string())
+    server.quit()
+
+
+def send_otp_code(usermail, email="exe.dumper@yandex.ru"):
+    code = gen_otp()
+
+    msg = MIMEMultipart("alternative")
+    msg["From"] = email
+    msg["To"] = usermail
+    msg["Subject"] = "ExeDumper authentication code"
+
+    html = open("templates/auth_mail_template.html").read()
+    html = bs(html, "html.parser")
+    html.strong.string.replace_with(code)
+    html.prettify(formatter="html")
+    text = ('Your code:\n{}'.format(code))
+
+    text_part = MIMEText(text, "plain")
+    html_part = MIMEText(html, "html")
+
+    msg.attach(text_part)
+    msg.attach(html_part)
+
+    send_mail(email, email, usermail, msg)
+    return generate_pwd_hash(code)
