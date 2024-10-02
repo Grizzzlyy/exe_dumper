@@ -53,9 +53,9 @@ class BD_int():
         return file_id
     
     def user_exists(self, username):
-        self.cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-        result = self.cursor.fetchone()
-        return result is not None
+        res = self.cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+        res = res.fetchone()
+        return res is not None
     
     def add_user(self, username, email, pwd_hash):
         try:
@@ -64,7 +64,7 @@ class BD_int():
                                     INSERT INTO users (username, is_admin, is_blocked, email, pwd_hash) 
                                     VALUES (?, 0, 0, ?, ?)
                                     """, (username, email, pwd_hash))
-                self.conn.commit
+                self.conn.commit()
                 logging.info(f"[SUCCESS] user {username} was added to users table")
             else:
                 return "user_exists" 
@@ -86,5 +86,21 @@ class BD_int():
             logging.info(e)
             return -1
         
+    def check_admin(self, admin):
+        res = self.cursor.execute("SELECT is_admin FROM users WHERE username = ?",(admin,))
+        res = res.fetchone()
+        return res == (1,)
+    
+    def ban_user(self, admin, username):
+        try:
+            if not self.check_admin(admin):
+                raise ValueError(f"Not an admin:{admin} try to ban user:{username}")
+            if self.check_admin(username):
+                raise ValueError(f"Try to ban admin:{username}")
+            self.cursor.execute("UPDATE users set is_blocked = 1 WHERE username = ?",(username,))
+            self.conn.commit()
+            logging.info(f"[SUCCESS] user:{username} is blocked")
+        except Exception as e:
+            logging.info(f"[ERROR] {e}")
     def __del__(self):
         self.conn.close()
