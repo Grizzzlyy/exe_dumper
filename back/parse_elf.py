@@ -51,23 +51,20 @@ ELF_HEADER_FIELDS_32 = [
 def parse_elf_header(file_path):
     binary  = lief.parse(file_path)
     exe_data = {}
-    exe_data['ELF_Header'] = {}
     segments={}
-    segments['Segments']={}
     sections={}
-    sections['Sections']={}
     symbols={}
-    symbols['Symbols']={}
+
     offsets_list = []
     for i in range(len(binary.segments)):
-        segments['Segments']["Segment"+str(i)] = {
+        segments["Segment"+str(i)] = {
                     'vaddr': binary.segments[i].virtual_address,
                     'offset': binary.segments[i].file_offset,
                     'virtual_size': binary.segments[i].virtual_size,
                     'physical_size': binary.segments[i].physical_size
                 }
     for i in range(len(binary.sections)):
-        sections['Sections'][binary.sections[i].name] = {
+        sections[binary.sections[i].name] = {
                     'type': str(binary.sections[i].type).split(".")[-1],
                     'vaddr': binary.sections[i].virtual_address,
                     'offset': binary.sections[i].file_offset,
@@ -75,7 +72,7 @@ def parse_elf_header(file_path):
 
                 }
     for i in range(len(binary.symbols)):
-        symbols['Symbols'][binary.symbols[i].name] = {
+        symbols[binary.symbols[i].name] = {
                     'type': str(binary.symbols[i].type).split(".")[-1],
                     'vaddr': binary.symbols[i].value,
                     'size': binary.symbols[i].size,
@@ -106,17 +103,12 @@ def parse_elf_header(file_path):
                 
                 field_bytes = raw_header[current_offset:current_offset + field_size]
                 
-                if field_name.startswith("EI_MAG"):
-                    try:
-                        field_value = field_bytes.decode('utf-8')
-                    except UnicodeDecodeError:
-                        field_value = ''.join(f'\\x{b:02x}' for b in field_bytes)
-                elif field_name.startswith("EI_PAD"):
-                    field_value = ''.join(f'\\x{b:02x}' for b in field_bytes)
+                if field_name.startswith("EI_MAG") or field_name.startswith("EI_PAD"):
+                    field_value = field_bytes.hex(" ")
                 else:
                     field_value = int.from_bytes(field_bytes, byteorder=endian)
                 
-                exe_data['ELF_Header'][field_name] = {
+                exe_data[field_name] = {
                     'value': field_value,
                     'offset': current_offset,
                     'length': field_size
@@ -131,7 +123,7 @@ def parse_elf_header(file_path):
                     field_length = header_fields[idx + 1]['size']
                 else:
                     field_length = header_fields[idx]['size']
-                exe_data['ELF_Header'][field_name]['length'] = field['size']
+                exe_data[field_name]['length'] = field['size']
             
         return exe_data,segments,sections,symbols
     
@@ -144,6 +136,11 @@ def parse_elf_header(file_path):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return None
+def binary_substitute(file_content, offset,length,hex_str):
+    file_list=list(file_content)
+    sub_list=list(bytes.fromhex(hex_str))
+    file_list[offset:offset+length]=sub_list
+    return bytes(file_list)
 
 def parse_elf_as_hex(file_path):
     try:
