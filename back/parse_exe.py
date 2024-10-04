@@ -1,36 +1,42 @@
 import pefile
 import binascii
 import sys
+import struct
 
 def parse_ms_dos(pe):
-    header_data = {}
-    offsets_list = []
+    try:
+        header_data = {}
+        offsets_list = []
 
-    for field in pe.DOS_HEADER.__keys__:
-        field_value = getattr(pe.DOS_HEADER, field[0])
-        offset = pe.DOS_HEADER.__file_offset__ + pe.DOS_HEADER.get_field_absolute_offset(field[0])
+        for field in pe.DOS_HEADER.__keys__:
+            field_value = getattr(pe.DOS_HEADER, field[0])
+            offset = pe.DOS_HEADER.__file_offset__ + pe.DOS_HEADER.get_field_absolute_offset(field[0])
 
-        offsets_list.append(offset)        #save offset to list to count field_len
+            offsets_list.append(offset)        #save offset to list to count field_len
 
-        header_data[field[0]] = {
-            'value': str(hex(field_value))[2:] if isinstance(field_value, int) else str(field_value),
-            'offset': offset
-        }
+            header_data[field[0]] = {
+                'value': field_value,
+                'offset': offset
+            }
 
-    offsets_list.append(pe.DOS_HEADER.sizeof()) #add ms dos size 
-    idx = 0
-    for field in header_data:
-        field_length = offsets_list[idx+1] - offsets_list[idx] 
-        header_data[field]['length'] = field_length
-
-    return header_data
+        offsets_list.append(pe.DOS_HEADER.sizeof()) #add ms dos size 
+        idx = 0
+        for field in header_data:
+            field_length = offsets_list[idx+1] - offsets_list[idx] 
+            header_data[field]['length'] = field_length
+            field_value = header_data[field]['value'] 
+            header_data[field]['value'] = field_value.to_bytes(field_length, 'little').hex() if isinstance(field_value, int) else field_value.hex()
+            idx+=1
+        return header_data
+    except Exception as e:
+        print(e)
 
 def parse_pe_header(pe):
     header_data = {}
     offsets_list = []
-
+    field_value = pe.NT_HEADERS.Signature
     header_data['Signature'] = {
-            'value': str(hex(pe.NT_HEADERS.Signature))[2:],
+            'value': field_value.to_bytes(4,'little').hex(),
             'offset': pe.NT_HEADERS.get_field_absolute_offset('Signature'),
             'length': 4
         }
@@ -40,9 +46,10 @@ def parse_pe_header(pe):
         offset = pe.FILE_HEADER.__file_offset__ + pe.FILE_HEADER.get_field_absolute_offset(field[0])
 
         offsets_list.append(offset)        #save offset to list to count field_len
-
+        value = field_value
+        
         tmp_dict[field[0]] = {
-            'value': str(hex(field_value))[2:] if isinstance(field_value, int) else str(field_value),
+            'value': value,
             'offset': offset
         }
 
@@ -52,6 +59,9 @@ def parse_pe_header(pe):
     for field in tmp_dict:
         field_length = offsets_list[idx+1] - offsets_list[idx] 
         tmp_dict[field]['length'] = field_length
+        field_value = tmp_dict[field]['value'] 
+        tmp_dict[field]['value'] = field_value.to_bytes(field_length, 'little').hex() if isinstance(field_value, int) else field_value.hex()
+        idx+=1
     header_data |= tmp_dict
     return header_data
 
