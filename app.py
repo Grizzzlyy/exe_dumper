@@ -1,13 +1,13 @@
 import os
-
-from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from functools import wraps
-from dotenv import load_dotenv
 
-from logic.auth import is_user_exists, send_otp_code, check_user_password, generate_pwd_hash, check_pwd_hash
-from logic.db_users import get_user_info, add_user
+from dotenv import load_dotenv
+from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory
+from flask_login import LoginManager, UserMixin, login_required, logout_user, current_user, login_user
+
+from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, send_otp_code
 from logic.db_reports import get_report
+from logic.db_users import get_user_info, add_user
 from logic.kartonn import create_report
 
 load_dotenv()
@@ -95,39 +95,41 @@ def signup():
         session["username"] = username
         session["email"] = email
         session["pwd_hash"] = generate_pwd_hash(password)
-        return redirect(url_for('verify_email'))
+        session["code_sent"] = False
+        return redirect(url_for('check_mail_code'))
 
     return render_template('signup.html')
 
 
 # Right after signup
-@app.route('/verify_email', methods=['GET', 'POST'])
+@app.route('/verify', methods=['GET', 'POST'])
 @pwd_correct
-def verify_email():
+def check_mail_code():
+    if not session.get('code_sent'):
+        session['otp_code_hash'] = send_otp_code(session.get('email'))
+        session['code_sent'] = True
+
     if request.method == 'POST':
         if 'send_code' in request.form:
             session['otp_code_hash'] = send_otp_code(session.get('email'))
-            flash(f"OTP code has been sent to your email {session.get('email')}.")  # Simulate by showing it in flash
-            return redirect(url_for('verify_email'))
         elif 'verify_code' in request.form:
             code = request.form['code']
             code_hash = session.get('otp_code_hash')
 
             if check_pwd_hash(code_hash, code):
-                # Add user to database
-                user = {"username": session.get('username'), "email": session.get('email'),
-                        "pwd_hash": session.get('pwd_hash'), "has_access": True, "is_admin": False}
-                add_user(user)
+                if not is_user_exists(session.get('username')):
+                    # Add user to database
+                    user = {"username": session.get('username'), "email": session.get('email'),
+                            "pwd_hash": session.get('pwd_hash'), "has_access": True, "is_admin": False}
+                    add_user(user)
 
-                session.pop('username', None)
-                session.pop('email', None)
-                session.pop('pwd_hash', None)
-                session.pop('is_pwd_correct', None)
-                return redirect(url_for('signin'))
+                user = User(session.get('username'), session.get('email'), has_access=True, is_admin=False)
+                login_user(user)
+                return redirect(url_for('index'))
             else:
                 flash('Invalid code. Please try again.')
 
-    return render_template('verify_email.html')
+    return render_template('verification.html')
 
 
 @app.route('/signin', methods=['GET', 'POST'])
@@ -143,36 +145,13 @@ def signin():
                 session["is_pwd_correct"] = True
                 session["username"] = user_info["username"]
                 session["email"] = user_info["email"]
+                session["code_sent"] = False
 
-                return redirect(url_for('two_factor_auth'))
+                return redirect(url_for('check_mail_code'))
             else:
                 flash('Invalid login or password. Please try again.')
 
     return render_template('signin.html')
-
-
-@app.route('/two_factor_auth', methods=['GET', 'POST'])
-@pwd_correct
-def two_factor_auth():
-    if request.method == 'POST':
-        if 'send_code' in request.form:
-            session['otp_code_hash'] = send_otp_code(session.get('email'))
-            flash(f"OTP code has been sent to your email {session.get('email')}.")  # Simulate by showing it in flash
-            return redirect(url_for('two_factor_auth'))
-        elif 'verify_code' in request.form:
-            code = request.form['code']
-            code_hash = session.get('otp_code_hash')
-            if code_hash is None:
-                flash("You didn't request 2FA code!")
-                return redirect(url_for('two_factor_auth'))
-            if check_pwd_hash(code_hash, code):
-                user = User(session.get('username'), session.get('email'), has_access=True, is_admin=False)
-                login_user(user)
-                return redirect(url_for('index'))
-            else:
-                flash('Invalid code. Please try again.')
-
-    return render_template('two_factor_auth.html')
 
 
 @app.route('/upload', methods=['GET', 'POST'])

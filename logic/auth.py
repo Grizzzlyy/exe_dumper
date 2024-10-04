@@ -1,3 +1,10 @@
+import secrets
+import smtplib
+import string
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+from bs4 import BeautifulSoup as bs
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from logic.db_users import get_user_info
@@ -28,7 +35,41 @@ def check_user_password(login, password):
     return check_pwd_hash(user_info["pwd_hash"], password)
 
 
-def send_otp_code(email='hello@mail.ru'):
-    # Generate code, send it to email and return hash
-    return generate_pwd_hash('123456')
+def gen_otp(length=6):
+    symbols = string.digits + string.ascii_uppercase
+    otp = ''.join(secrets.choice(symbols) for _ in range(length))
+    return otp
 
+
+def send_mail(email, FROM, TO, msg):
+    # TODO доставать из БД
+    password = "trwfdogydawefhff"
+
+    server = smtplib.SMTP_SSL("smtp.yandex.ru")
+    server.login(email, password)
+    server.sendmail(FROM, TO, msg.as_string())
+    server.quit()
+
+
+def send_otp_code(usermail, email="exe.dumper@yandex.ru"):
+    code = gen_otp()
+
+    msg = MIMEMultipart("alternative")
+    msg["From"] = email
+    msg["To"] = usermail
+    msg["Subject"] = "ExeDumper authentication code"
+
+    html = open("templates/auth_mail_template.html").read()
+    html = bs(html, "html.parser")
+    html.strong.string.replace_with(code)
+    html.prettify(formatter="html")
+    text = ('Your code:\n{}'.format(code))
+
+    text_part = MIMEText(text, "plain")
+    html_part = MIMEText(html, "html")
+
+    msg.attach(text_part)
+    msg.attach(html_part)
+
+    send_mail(email, email, usermail, msg)
+    return generate_pwd_hash(code)

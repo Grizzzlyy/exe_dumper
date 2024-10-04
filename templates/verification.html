@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Verify email{% endblock %}
+{% block title %}Verification{% endblock %}
 
 {% block content %}
 <div class="signin-container">
     <h2>Verify email</h2>
 
     <form method="POST">
-        <button type="submit" name="send_code">Send Code</button>
-    </form>
-
-    <form method="POST">
-        <label for="code">Enter the 2FA code sent to your email ({{session.get('email')}}):</label>
+        <label for="code">Enter verification code sent to your email ({{session.get('email')}}):</label>
         <input type="text" id="code" name="code" required>
         <br>
         <button type="submit" name="verify_code">Verify Code</button>
+    </form>
+
+    <form method="POST">
+        <button type="submit" name="send_code">Send again</button>
     </form>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
