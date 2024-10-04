@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  # Database
+  postgres:
+    container_name: BIPdb
+    image: postgres:16.4
+    env_file:
+      - /app/exe_dumper/.env-database
+    volumes:
+      - database_dbdata:/app/database/data/postgres
+    ports:
+      - "5432:5432"
+    restart: always
+  
+  #Main app
+  exe_dumper:
+    container_name: exe_dump
+    image: exe_dumper:1
+    ports:
+      - "80:5000"
+    restart: always
+
+volumes:
+  database_dbdata:
+    external: true
