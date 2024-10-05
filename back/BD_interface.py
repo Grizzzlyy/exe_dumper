@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 from back import parse_exe
 from back import parse_elf
+from back.parse_file import file_to_hex
 
 load_dotenv()
 
@@ -111,24 +112,42 @@ class BD_int():
             logging.info(f"[SUCCESS] user:{username} is blocked")
         except Exception as e:
             logging.info(f"[ERROR] {e}")
+    def add_2f_code(self,username,code):
+        try: 
+            self.cursor.execute("UPDATE users set two_factor_code = ? WHERE username = ?", (code,username))
+            logging.info(f"[SUCCESS] added code: {code} for user:{username}")
+        except Exception as e:
+            logging.info(f"[ERROR] {e}")
+
 
     # TODO use self.conn etc, like you want
     def get_report(self, file_id):
-        conn = sqlite3.connect(BD_path)
-        conn.row_factory = sqlite3.Row  # gets strings as a dict
+        self.conn.row_factory = sqlite3.Row  # gets strings as a dict
+        self.cursor = self.conn.cursor()
+        subd_answer = self.cursor.execute(f'SELECT * FROM files WHERE idx = {file_id}').fetchone()
+        
+        self.conn.close()
+        report = dict()
+        if subd_answer is not None:
+            subd_answer = dict(subd_answer)
+            if subd_answer['filetype'] == 'exe':
+                report['MS_DOS_header'] = json.loads(subd_answer['header_first'])
+                report['PE_header'] = json.loads(subd_answer['header_second'])
+                report['Import_table'] = json.loads(subd_answer['import_table'])
+                report['Export_table'] = json.loads(subd_answer['export_table'])
+            else:
+                json_fields = [ 'header', 'segments', 'sections', 'symbols']
+                report['ELF_header'] = json.loads(subd_answer['header_first'])
+                report['Segments'] = json.loads(subd_answer['header_second'])
+                report['Sections'] = json.loads(subd_answer['import_table'])
+                report['Symbols'] = json.loads(subd_answer['export_table'])
 
-        report = conn.execute(f'SELECT * FROM files WHERE idx = {file_id}').fetchone()
-        conn.close()
+            file_name = subd_answer['file_name']
+            file_content = file_to_hex(file_path='files/'+file_name)
+            report["file_content"] = file_content
+        return subd_answer
 
-        if report is not None:
-            report = dict(report)
-            json_fields = ['header_first', 'header_second', 'import_table', 'export_table']
 
-            for field in report:
-                if field in json_fields:
-                    report[field] = json.loads(report[field])
-
-        return report
 
     def __del__(self):
         self.conn.close()
