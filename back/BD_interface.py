@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from back import parse_exe
 from back import parse_elf
-from back.parse_file import file_to_hex
+from back.parse_file import get_chunk
 
 load_dotenv()
 
@@ -143,7 +143,7 @@ class BD_int():
                 report['Sections'] = json.loads(subd_answer['import_table'])
                 report['Symbols'] = json.loads(subd_answer['export_table'])
 
-            file_content = file_to_hex(file_path='files/' + subd_answer['file_name'])
+            file_content = get_chunk(0,'files/' + subd_answer['file_name'])
             report["file_content"] = file_content
         return report
 
