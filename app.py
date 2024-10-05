@@ -9,40 +9,18 @@ from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, c
 from logic.db_reports import get_report
 from logic.db_users import get_user_info, add_user
 from logic.kartonn import create_report
+from logic import user_manage
+from logic import api
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("APP_SECRET_KEY")
 
-# Initialize Flask-Login
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'signup'  # Redirect to login page if not logged in
+user_manage.init(app, 'signup')
+api.init(app)
 
 UPLOADS_DIR = os.getenv("UPLOADS_DIR")
-
-
-# current_user from flask-login
-class User(UserMixin):
-    def __init__(self, username, email, has_access, is_admin):
-        self.username = username
-        self.email = email
-        self.has_access = has_access
-        self.is_admin = is_admin
-
-    def get_id(self):
-        return self.username
-
-
-@login_manager.user_loader
-def load_user(login):
-    user_info = get_user_info(login)
-    if user_info is None:
-        return None
-    else:
-        return User(user_info["username"], user_info["email"], user_info["has_access"],
-                    user_info["is_admin"])
 
 
 # Decorator, if first step of 2FA is completed
@@ -71,6 +49,7 @@ def admin_required(f):
 
 @app.route('/')
 def index():
+    print(current_user.is_authenticated)  # Debugging purpose
     if current_user.is_authenticated:
         return redirect(url_for('upload'))
     return redirect(url_for('signin'))
@@ -101,6 +80,28 @@ def signup():
     return render_template('signup.html')
 
 
+@app.route('/signin', methods=['GET', 'POST'])
+def signin():
+    if request.method == 'POST':
+        if 'login' in request.form and 'password' in request.form:
+            login = request.form['login']
+            password = request.form['password']
+
+            if check_user_password(login, password):
+                user_info = get_user_info(login)
+
+                session["is_pwd_correct"] = True
+                session["username"] = user_info["username"]
+                session["email"] = user_info["email"]
+                session["code_sent"] = False
+
+                return redirect(url_for('check_mail_code'))
+            else:
+                flash('Invalid login or password. Please try again.')
+
+    return render_template('signin.html')
+
+
 # Right after signup
 @app.route('/verify', methods=['GET', 'POST'])
 @pwd_correct
@@ -123,35 +124,13 @@ def check_mail_code():
                             "pwd_hash": session.get('pwd_hash'), "has_access": True, "is_admin": False}
                     add_user(user)
 
-                user = User(session.get('username'), session.get('email'), has_access=True, is_admin=False)
+                user = user_manage.User(session.get('username'), session.get('email'), has_access=True, is_admin=False)
                 login_user(user)
                 return redirect(url_for('index'))
             else:
                 flash('Invalid code. Please try again.')
 
     return render_template('verification.html')
-
-
-@app.route('/signin', methods=['GET', 'POST'])
-def signin():
-    if request.method == 'POST':
-        if 'login' in request.form and 'password' in request.form:
-            login = request.form['login']
-            password = request.form['password']
-
-            if check_user_password(login, password):
-                user_info = get_user_info(login)
-
-                session["is_pwd_correct"] = True
-                session["username"] = user_info["username"]
-                session["email"] = user_info["email"]
-                session["code_sent"] = False
-
-                return redirect(url_for('check_mail_code'))
-            else:
-                flash('Invalid login or password. Please try again.')
-
-    return render_template('signin.html')
 
 
 @app.route('/upload', methods=['GET', 'POST'])

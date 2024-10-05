@@ -1,16 +1,25 @@
 import sqlite3
 import json
-import magic
 import logging
+import os
+
+import magic
+from dotenv import load_dotenv
+
 from back import parse_exe
 from back import parse_elf
 
-BD_path = 'BD/files.db'
+load_dotenv()
+
+BD_path = os.getenv("DB_PATH")
+
 
 def get_file_type(file_path):
-        mime = magic.Magic(mime=True)  # Возвращает MIME-тип файла
-        file_type = mime.from_file(file_path)
-        return file_type
+    mime = magic.Magic(mime=True)  # Возвращает MIME-тип файла
+    file_type = mime.from_file(file_path)
+    return file_type
+
+
 # Функция для вставки данных о файле в базу
 class BD_int():
     def __init__(self):
@@ -18,21 +27,21 @@ class BD_int():
         self.cursor = self.conn.cursor()
         logging.basicConfig(
             filename='BD/file_processing.log',
-            level=logging.INFO,               
+            level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s')
 
-
-    def __insert_file(self,username, file_type, header_first, header_second, import_table, export_table):
+    def __insert_file(self, username, file_type, header_first, header_second, import_table, export_table):
         self.cursor.execute('''
             INSERT INTO files (username, filetype, header_first, header_second, import_table, export_table)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (username, file_type, json.dumps(header_first),json.dumps(header_second), json.dumps(import_table), json.dumps(export_table)))
+        ''', (username, file_type, json.dumps(header_first), json.dumps(header_second), json.dumps(import_table),
+              json.dumps(export_table)))
         self.conn.commit()
         generated_id = self.cursor.lastrowid
         logging.info(f"[SUCCESS] File with id:{generated_id} added")
         return generated_id
 
-    def __insert_exe(self,username, file_path):
+    def __insert_exe(self, username, file_path):
         parsed_ms_dos, parsed_pe_header, parsed_exports, parsed_imports = parse_exe.parse(file_path)
         file_id = self.__insert_file(username=username,
                                      file_type='exe',
@@ -42,21 +51,21 @@ class BD_int():
                                      export_table=parsed_exports)
         return file_id
 
-    def __insert_elf(self,username, file_path):
-        header,segments,sections,symbols = parse_elf.parse_elf_header(file_path)
-        file_id = self.__insert_file(username=username, 
+    def __insert_elf(self, username, file_path):
+        header, segments, sections, symbols = parse_elf.parse_elf_header(file_path)
+        file_id = self.__insert_file(username=username,
                                      file_type='exe',
                                      header_first=header,
                                      header_second=segments,
                                      import_table=sections,
                                      export_table=symbols)
         return file_id
-    
+
     def user_exists(self, username):
         res = self.cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
         res = res.fetchone()
         return res is not None
-    
+
     def add_user(self, username, email, pwd_hash):
         try:
             if not self.user_exists(username):
@@ -67,16 +76,16 @@ class BD_int():
                 self.conn.commit()
                 logging.info(f"[SUCCESS] user {username} was added to users table")
             else:
-                return "user_exists" 
+                return "user_exists"
         except Exception as e:
             logging.info(e)
 
-    def add_file(self,username, file_path):
+    def add_file(self, username, file_path):
         try:
             file_type = get_file_type(file_path)
             if 'exec' not in file_type:
                 raise ValueError(f"incorrect filetype:{file_path} - type:{file_type}")
-            
+
             if 'application' in file_type and ('portable-executable' in file_type or 'x-dosexec' in file_type):
                 file_id = self.__insert_exe(username, file_path)
             elif file_type == 'application/x-executable':
@@ -85,19 +94,19 @@ class BD_int():
         except Exception as e:
             logging.info(e)
             return -1
-        
+
     def check_admin(self, admin):
-        res = self.cursor.execute("SELECT is_admin FROM users WHERE username = ?",(admin,))
+        res = self.cursor.execute("SELECT is_admin FROM users WHERE username = ?", (admin,))
         res = res.fetchone()
         return res == (1,)
-    
+
     def ban_user(self, admin, username):
         try:
             if not self.check_admin(admin):
                 raise ValueError(f"Not an admin:{admin} try to ban user:{username}")
             if self.check_admin(username):
                 raise ValueError(f"Try to ban admin:{username}")
-            self.cursor.execute("UPDATE users set is_blocked = 1 WHERE username = ?",(username,))
+            self.cursor.execute("UPDATE users set is_blocked = 1 WHERE username = ?", (username,))
             self.conn.commit()
             logging.info(f"[SUCCESS] user:{username} is blocked")
         except Exception as e:
@@ -109,5 +118,31 @@ class BD_int():
         except Exception as e:
             logging.info(f"[ERROR] {e}")
 
+
+    # TODO use self.conn etc, like you want
+    def get_report(self, file_id):
+        conn = sqlite3.connect(BD_path)
+        conn.row_factory = sqlite3.Row  # gets strings as a dict
+
+        report = conn.execute(f'SELECT * FROM files WHERE idx = {file_id}').fetchone()
+        conn.close()
+
+        if report is not None:
+            report = dict(report)
+            json_fields = ['header_first', 'header_second', 'import_table', 'export_table']
+
+            for field in report:
+                if field in json_fields:
+                    report[field] = json.loads(report[field])
+
+        return report
+
     def __del__(self):
         self.conn.close()
+
+
+# Testing
+if __name__ == "__main__":
+    bd = BD_int()
+    report = bd.get_report(2)
+    pass

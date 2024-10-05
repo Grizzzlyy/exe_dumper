@@ -8,6 +8,8 @@ tmp_db = [
      "has_access": True, "is_admin": False},
     {"username": "clark", "email": "clark@mail.com", "pwd_hash": generate_password_hash('clark'),
      "has_access": True, "is_admin": False},
+    {"username": "james", "email": "daroslav.skiba@yandex.ru", "pwd_hash": generate_password_hash('james'),
+     "has_access": True, "is_admin": False},
 ]
 
 
