@@ -29,13 +29,30 @@ def file_to_hex(file_content):
         logging.info(f"[ERROR] {e}")
 
 def get_chunk(chunk_number,filename):
-    CHUNK_SIZE = int(os.getenv('CHUNK_SIZE'))
-    with open(filename,'r+b') as inputfile:
-        file_desc = inputfile.fileno()
-        mmapped_file = mmap.mmap(file_desc,0)
 
-        chunk = mmapped_file[chunk_number*CHUNK_SIZE:(chunk_number+1)*CHUNK_SIZE]
+    chunk_size = int(os.getenv('CHUNK_SIZE'))
+    f_size = os.path.getsize(filename)
 
-        hex_view = file_to_hex(chunk)
-        inputfile.close()
-        return hex_view
+    if chunk_number * (chunk_size) > f_size:
+        return None
+    
+    elif (chunk_number+1) * chunk_size > f_size:
+        chunk_size = f_size - (chunk_number) * chunk_size 
+
+    try:
+        with open(filename,'r+b') as f:
+            f.seek(chunk_size*chunk_number,0)
+            chunk = str()
+
+            with mmap.mmap(fileno=f.fileno(),length=chunk_size,access=mmap.ACCESS_READ) as mm:
+                chunk = mm.read(chunk_size).hex()
+
+            f.close()
+            return chunk
+    except Exception as e:
+        logging.info(e)
+        
+def write_changes_to_file(offset,str,str_len,filename):
+    with open(filename,'wb') as outfile:
+        file_desc = outfile.fileno()
+        mmaped_file = mmap.mmap(file_desc,1)
