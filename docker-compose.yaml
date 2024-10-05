@@ -12,13 +12,21 @@ services:
       - "5432:5432"
     restart: always
   
-  #Main app
+  # Main app
   exe_dumper:
     container_name: exe_dump
     image: exe_dumper:1
     ports:
       - "80:5000"
     restart: always
+
+    # Evil twin
+    evil_dumper:
+      container_name: evil_dumper
+      image: evil_dumper:1
+      ports:
+        - "8080:5000"
+      restart: always
 
 volumes:
   database_dbdata:
