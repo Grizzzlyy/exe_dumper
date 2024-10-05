@@ -154,3 +154,70 @@ summary {
     cursor: pointer;
     font-weight: bold;
 }
+
+.hex-viewer-container {
+    display: flex;
+    flex-direction: column;
+    font-family: monospace; /* Make sure all text is in a monospace font */
+}
+
+.hex-viewer-header {
+    display: flex;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    background-color: #f0f0f0;
+}
+
+.header-offset, .header-hex, .header-decoded {
+    padding: 2px 5px; /* Reduce padding to make the gap smaller */
+    border-bottom: 1px solid #ccc;
+}
+
+.header-offset {
+    width: 10%;
+    text-align: left;
+}
+
+.header-hex {
+    width: 50%;
+    text-align: left;
+}
+
+.header-decoded {
+    width: 40%;
+    text-align: left;
+}
+
+.hex-viewer-content {
+    display: flex;
+    overflow-y: auto;
+    height: 400px; /* Adjust as needed */
+}
+
+.offsets, .hex, .decoded-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.offsets {
+    width: 10%;
+}
+
+.hex {
+    width: 50%;
+}
+
+.decoded-text {
+    width: 40%;
+}
+
+.offset-line, .hex-line, .decoded-line {
+    padding: 2px 5px; /* Reduce padding */
+    white-space: pre;
+    font-family: monospace; /* Ensure monospace for all lines */
+}
+
+.hex-viewer-header, .offset-line, .hex-line, .decoded-line {
+    margin: 0; /* Remove unnecessary margins */
+}

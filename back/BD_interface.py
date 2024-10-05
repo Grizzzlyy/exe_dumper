@@ -112,24 +112,26 @@ class BD_int():
             logging.info(f"[SUCCESS] user:{username} is blocked")
         except Exception as e:
             logging.info(f"[ERROR] {e}")
-    def add_2f_code(self,username,code):
-        try: 
-            self.cursor.execute("UPDATE users set two_factor_code = ? WHERE username = ?", (code,username))
+
+    def add_2f_code(self, username, code):
+        try:
+            self.cursor.execute("UPDATE users set two_factor_code = ? WHERE username = ?", (code, username))
             logging.info(f"[SUCCESS] added code: {code} for user:{username}")
         except Exception as e:
             logging.info(f"[ERROR] {e}")
-
 
     # TODO use self.conn etc, like you want
     def get_report(self, file_id):
         self.conn.row_factory = sqlite3.Row  # gets strings as a dict
         self.cursor = self.conn.cursor()
         subd_answer = self.cursor.execute(f'SELECT * FROM files WHERE idx = {file_id}').fetchone()
-        
+
         self.conn.close()
         report = dict()
         if subd_answer is not None:
             subd_answer = dict(subd_answer)
+            report['filetype'] = subd_answer['filetype']
+            report['filename'] = subd_answer['file_name']
             if subd_answer['filetype'] == 'exe':
                 report['MS_DOS_header'] = json.loads(subd_answer['header_first'])
                 report['PE_header'] = json.loads(subd_answer['header_second'])
@@ -141,14 +143,15 @@ class BD_int():
                 report['Sections'] = json.loads(subd_answer['import_table'])
                 report['Symbols'] = json.loads(subd_answer['export_table'])
 
-            file_name = subd_answer['file_name']
-            file_content = file_to_hex(file_path='files/'+file_name)
+            file_content = file_to_hex(file_path='files/' + subd_answer['file_name'])
             report["file_content"] = file_content
         return report
-
-
 
     def __del__(self):
         self.conn.close()
 
 
+if __name__ == "__main__":
+    bd = BD_int()
+    report = bd.get_report(2)
+    pass

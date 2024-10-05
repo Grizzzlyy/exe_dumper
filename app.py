@@ -2,7 +2,7 @@ import os
 from functools import wraps
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory
+from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory, jsonify
 from flask_login import LoginManager, UserMixin, login_required, logout_user, current_user, login_user
 
 from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, send_otp_code
@@ -12,6 +12,7 @@ from logic.kartonn import create_report
 from logic import user_manage
 from logic import api
 from back.BD_interface import BD_int
+from back.parse_file import file_to_hex
 
 load_dotenv()
 
@@ -174,26 +175,51 @@ def history():
 def show_report(file_id):
     bd = BD_int()
     report = bd.get_report(file_id)
-    with open("file_content.txt", "r") as fp:
-        hex_ = fp.read()
-    formatted_hex = format_hex(hex_)
-    return render_template('report_new.html', report=report, formatted_hex=formatted_hex)
-    # report = get_report(current_user.username, report_id)
-    # return render_template('report.html', report=report)
+    offsets, hex_lines, decoded_text = format_hex(report["file_content"])
+    return render_template('report_new.html', report=report, offsets=offsets, hex_lines=hex_lines, decoded_text=decoded_text)
 
+
+@app.route('/hex/<int:file_id>', methods=['GET'])
+@login_required
+def get_hex_chunk(file_id):
+    start = request.args.get('start', 0, type=int)  # Start offset
+    size = request.args.get('size', 256, type=int)  # Size of the chunk in bytes
+
+    bd = BD_int()
+    report = bd.get_report(file_id)
+
+    # Extract hex content
+    hex_str = report["file_content"]
+
+    # Convert the string to bytes for slicing
+    hex_bytes = bytes.fromhex(hex_str)
+
+    # Get the requested chunk
+    chunk = hex_bytes[start:start + size]
+
+    # Format the hex and ASCII representation of the chunk
+    formatted_hex = format_hex(chunk.hex())
+
+    return jsonify({'formatted_hex': formatted_hex, 'total_size': len(hex_bytes)})
 
 def format_hex(hex_str):
+    offsets = []
     hex_lines = []
+    decoded_text = []
     bytes_per_line = 16
 
     for i in range(0, len(hex_str), bytes_per_line * 2):
         offset = f"{i // 2:08X}"
-        hex_bytes = [hex_str[j:j+2] for j in range(i, min(i + bytes_per_line * 2, len(hex_str)), 2)]
+        hex_bytes = [hex_str[j:j + 2] for j in range(i, min(i + bytes_per_line * 2, len(hex_str)), 2)]
         hex_section = ' '.join(hex_bytes)
         ascii_section = ''.join([chr(int(b, 16)) if 32 <= int(b, 16) <= 126 else '.' for b in hex_bytes])
-        hex_lines.append(f"{offset}  {hex_section:<47}  {ascii_section}")
 
-    return hex_lines
+        offsets.append(offset)
+        hex_lines.append(hex_section)
+        decoded_text.append(ascii_section)
+
+    return offsets, hex_lines, decoded_text
+
 
 # Download binary from report
 @app.route('/uploads/<string:username>/<string:filename>')
