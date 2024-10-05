@@ -131,20 +131,20 @@ class BD_int():
         if subd_answer is not None:
             subd_answer = dict(subd_answer)
             if subd_answer['filetype'] == 'exe':
-                report['MS_DOS_header'] = subd_answer['header_first']
-                report['PE_header'] = subd_answer['header_second']
-                report['Import_table'] = subd_answer['import_table']
-                report['Export_table'] = subd_answer['export_table']
+                report['MS_DOS_header'] = json.loads(subd_answer['header_first'])
+                report['PE_header'] = json.loads(subd_answer['header_second'])
+                report['Import_table'] = json.loads(subd_answer['import_table'])
+                report['Export_table'] = json.loads(subd_answer['export_table'])
             else:
                 json_fields = [ 'header', 'segments', 'sections', 'symbols']
-                report['ELF_header'] = subd_answer['header_first']
-                report['Segments'] = subd_answer['header_second']
-                report['Sections'] = subd_answer['import_table']
-                report['Symbols'] = subd_answer['export_table'] 
+                report['ELF_header'] = json.loads(subd_answer['header_first'])
+                report['Segments'] = json.loads(subd_answer['header_second'])
+                report['Sections'] = json.loads(subd_answer['import_table'])
+                report['Symbols'] = json.loads(subd_answer['export_table'])
 
             file_name = subd_answer['file_name']
             file_content = file_to_hex(file_path='files/'+file_name)
-            report["file_content"] = json.loads(file_content)
+            report["file_content"] = file_content
         return subd_answer
 
 
