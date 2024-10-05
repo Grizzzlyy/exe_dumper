@@ -1,16 +1,18 @@
+import json
+import sqlite3
+
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
 from flasgger import Swagger, swag_from
-import sqlite3
 
-app = Flask(__name__)
-api = Api(app)
-swagger = Swagger(app)
+from back.BD_interface import BD_int
 
-def get_db_connection():
+
+def _get_db_connection():
     conn = sqlite3.connect('BD/files.db')
     conn.row_factory = sqlite3.Row  # gets strings as a dict
     return conn
+
 
 class Report(Resource):
     @swag_from({
@@ -35,34 +37,21 @@ class Report(Resource):
                 'in': 'path',
                 'type': 'string',
                 'required': True
-            },
-            {
-                'name': 'required_fields',
-                'description': 'List of fields to retrieve',
-                'in': 'query',
-                'type': 'array',
-                'items': {
-                    'type': 'string'
-                },
-                'required': True
             }
         ]
     })
     def get(self, file_id):
-        """Retrieve specified fields from a report."""
-        required_fields = request.args.getlist('required_fields')
-        
-        conn = get_db_connection()
-        report = conn.execute('SELECT * FROM files WHERE id = ?', (file_id,)).fetchone()
-        conn.close()
+        bd = BD_int()
+
+        report = bd.get_report(file_id)
 
         if report is None:
             return {'message': 'Report not found'}, 404
-        result = {field: report[field] for field in required_fields if field in report.keys()}
+        else:
+            return report
 
-        return jsonify(result)
 
-api.add_resource(Report, '/report/<string:file_id>')
-
-if __name__ == '__main__':
-    app.run(debug=True)
+def init(app):
+    api = Api(app)
+    swagger = Swagger(app)
+    api.add_resource(Report, '/api/report/<string:file_id>')
