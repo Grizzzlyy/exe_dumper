@@ -136,7 +136,6 @@ class BD_int():
                 report['Import_table'] = json.loads(subd_answer['import_table'])
                 report['Export_table'] = json.loads(subd_answer['export_table'])
             else:
-                json_fields = [ 'header', 'segments', 'sections', 'symbols']
                 report['ELF_header'] = json.loads(subd_answer['header_first'])
                 report['Segments'] = json.loads(subd_answer['header_second'])
                 report['Sections'] = json.loads(subd_answer['import_table'])
@@ -145,7 +144,7 @@ class BD_int():
             file_name = subd_answer['file_name']
             file_content = file_to_hex(file_path='files/'+file_name)
             report["file_content"] = file_content
-        return subd_answer
+        return report
 
 
 
@@ -153,8 +152,3 @@ class BD_int():
         self.conn.close()
 
 
-# Testing
-if __name__ == "__main__":
-    bd = BD_int()
-    report = bd.get_report(2)
-    pass
