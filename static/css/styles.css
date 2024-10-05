@@ -143,3 +143,14 @@ table a:hover {
 .signin-container p {
     text-align: center; /* Center the text */
 }
+
+.dropdown {
+    margin: 10px 0;
+}
+.dropdown-content {
+    margin-left: 20px;
+}
+summary {
+    cursor: pointer;
+    font-weight: bold;
+}

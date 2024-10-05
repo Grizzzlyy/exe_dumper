@@ -1,3 +1,90 @@
 {% extends "base_nav.html" %}
 
 {% block title %}Report{% endblock %}
+
+{% block content %}
+<h1>Report Details</h1>
+
+
+<div class="report-container">
+    <details class="dropdown">
+        <summary>General Information</summary>
+        <div class="dropdown-content">
+            <p><strong>Index:</strong> {{ report.idx }}</p>
+            <p><strong>Username:</strong> {{ report.username }}</p>
+            <p><strong>Filetype:</strong> {{ report.filetype }}</p>
+        </div>
+    </details>
+
+    <details class="dropdown">
+        <summary>Header First</summary>
+        <div class="dropdown-content">
+            {% for key, value in report.header_first.items() %}
+            <details>
+                <summary>{{ key }}</summary>
+                <div class="dropdown-content">
+                    <p><strong>Value:</strong> {{ value.value }}</p>
+                    <p><strong>Offset:</strong> {{ value.offset }}</p>
+                    <p><strong>Length:</strong> {{ value.length }}</p>
+                </div>
+            </details>
+            {% endfor %}
+        </div>
+    </details>
+
+    <details class="dropdown">
+        <summary>Header Second</summary>
+        <div class="dropdown-content">
+            {% for key, value in report.header_second.items() %}
+            <details>
+                <summary>{{ key }}</summary>
+                <div class="dropdown-content">
+                    <p><strong>Value:</strong> {{ value.value }}</p>
+                    <p><strong>Offset:</strong> {{ value.offset }}</p>
+                    <p><strong>Length:</strong> {{ value.length }}</p>
+                </div>
+            </details>
+            {% endfor %}
+        </div>
+    </details>
+
+    <details class="dropdown">
+        <summary>Import Table</summary>
+        <div class="dropdown-content">
+            {% for dll_name, functions in report.import_table.items() %}
+            <details>
+                <summary>{{ dll_name }}</summary>
+                <div class="dropdown-content">
+                    {% for function in functions %}
+                    <details>
+                        <summary>{{ function.function }}</summary>
+                        <div class="dropdown-content">
+                            <p><strong>Address:</strong> {{ function.address }}</p>
+                            <p><strong>Offset:</strong> {{ function.offset }}</p>
+                            <p><strong>Length:</strong> {{ function.length }}</p>
+                        </div>
+                    </details>
+                    {% endfor %}
+                </div>
+            </details>
+            {% endfor %}
+        </div>
+    </details>
+
+    <details class="dropdown">
+        <summary>Export Table</summary>
+        <div class="dropdown-content">
+            <p>{{ report.export_table | default('No export information available') }}</p>
+        </div>
+    </details>
+</div>
+
+<div id="hex-viewer">
+    <h2>Hex Viewer</h2>
+    <pre id="hex-content">
+        {% for line in formatted_hex %}
+            {{ line }}
+        {% endfor %}
+    </pre>
+</div>
+{% endblock %}
