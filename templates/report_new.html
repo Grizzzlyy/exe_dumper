@@ -16,10 +16,16 @@
         </div>
     </details>
 
+    {% if report.filetype == "exe" %}
+        {% set fields = ['MS_DOS_header', 'PE_header', 'Import_table', 'Export_table'] %}
+    {% else %}
+        {% set fields = ['ELF_header', 'Segments', 'Sections', 'Symbols'] %}
+    {% endif %}
+
     <details class="dropdown">
-        <summary>Header First</summary>
+        <summary> {{ fields[0] }} </summary>
         <div class="dropdown-content">
-            {% for key, value in report.header_first.items() %}
+            {% for key, value in report[fields[0]].items() %}
             <details>
                 <summary>{{ key }}</summary>
                 <div class="dropdown-content">
@@ -33,9 +39,9 @@
     </details>
 
     <details class="dropdown">
-        <summary>Header Second</summary>
+        <summary> {{ fields[1] }} </summary>
         <div class="dropdown-content">
-            {% for key, value in report.header_second.items() %}
+            {% for key, value in report[fields[1]].items() %}
             <details>
                 <summary>{{ key }}</summary>
                 <div class="dropdown-content">
@@ -49,9 +55,9 @@
     </details>
 
     <details class="dropdown">
-        <summary>Import Table</summary>
+        <summary> {{ fields[2] }} </summary>
         <div class="dropdown-content">
-            {% for dll_name, functions in report.import_table.items() %}
+            {% for dll_name, functions in report[fields[2]].items() %}
             <details>
                 <summary>{{ dll_name }}</summary>
                 <div class="dropdown-content">
@@ -72,19 +78,53 @@
     </details>
 
     <details class="dropdown">
-        <summary>Export Table</summary>
+        <summary> {{ fields[3] }} </summary>
         <div class="dropdown-content">
-            <p>{{ report.export_table | default('No export information available') }}</p>
+            <p>{{ report[fields[3]] | default('No export information available') }}</p>
         </div>
     </details>
 </div>
 
-<div id="hex-viewer">
-    <h2>Hex Viewer</h2>
-    <pre id="hex-content">
-        {% for line in formatted_hex %}
-            {{ line }}
-        {% endfor %}
-    </pre>
+<div class="hex-viewer-container">
+    <div class="hex-viewer-header">
+        <div class="header-offset">Offset (h)</div>
+        <div class="header-hex">Hex</div>
+        <div class="header-decoded">Decoded Text</div>
+    </div>
+    <div class="hex-viewer-content">
+        <div class="offsets">
+            {% for offset in offsets %}
+                <div class="offset-line">{{ offset }}</div>
+            {% endfor %}
+        </div>
+        <div class="hex">
+            {% for hex_line in hex_lines %}
+                <div class="hex-line">{{ hex_line }}</div>
+            {% endfor %}
+        </div>
+        <div class="decoded-text">
+            {% for decoded in decoded_text %}
+                <div class="decoded-line">{{ decoded }}</div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const offsets = document.getElementById("offsets");
+        const hexContent = document.getElementById("hex-content");
+        const decodedText = document.getElementById("decoded-text");
+
+        function syncScroll(event) {
+            offsets.scrollTop = event.target.scrollTop;
+            hexContent.scrollTop = event.target.scrollTop;
+            decodedText.scrollTop = event.target.scrollTop;
+        }
+
+        offsets.addEventListener("scroll", syncScroll);
+        hexContent.addEventListener("scroll", syncScroll);
+        decodedText.addEventListener("scroll", syncScroll);
+    });
+</script>
 {% endblock %}
