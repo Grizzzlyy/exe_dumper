@@ -8,11 +8,6 @@ from flasgger import Swagger, swag_from
 from back.BD_interface import BD_int
 
 
-def _get_db_connection():
-    conn = sqlite3.connect('BD/files.db')
-    conn.row_factory = sqlite3.Row  # gets strings as a dict
-    return conn
-
 
 class Report(Resource):
     @swag_from({

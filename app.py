@@ -11,6 +11,7 @@ from logic.db_users import get_user_info, add_user
 from logic.kartonn import create_report
 from logic import user_manage
 from logic import api
+from back.BD_interface import BD_int
 
 load_dotenv()
 
@@ -168,11 +169,14 @@ def history():
     return render_template('upload.html')
 
 
-@app.route('/report/<int:report_id>', methods=['GET', 'POST'])
+@app.route('/report/<int:file_id>', methods=['GET', 'POST'])
 @login_required
-def show_report(report_id):
-    report = get_report(current_user.username, report_id)
-    return render_template('report.html', report=report)
+def show_report(file_id):
+    bd = BD_int()
+    report = bd.get_report(file_id)
+    return report
+    # report = get_report(current_user.username, report_id)
+    # return render_template('report.html', report=report)
 
 
 # Download binary from report
