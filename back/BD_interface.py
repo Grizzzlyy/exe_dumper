@@ -102,5 +102,12 @@ class BD_int():
             logging.info(f"[SUCCESS] user:{username} is blocked")
         except Exception as e:
             logging.info(f"[ERROR] {e}")
+    def add_2f_code(self,username,code):
+        try: 
+            self.cursor.execute("UPDATE users set two_factor_code = ? WHERE username = ?", (code,username))
+            logging.info(f"[SUCCESS] added code: {code} for user:{username}")
+        except Exception as e:
+            logging.info(f"[ERROR] {e}")
+
     def __del__(self):
         self.conn.close()
