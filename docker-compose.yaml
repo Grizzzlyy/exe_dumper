@@ -21,12 +21,12 @@ services:
     restart: always
 
     # Evil twin
-    evil_dumper:
-      container_name: evil_dumper
-      image: evil_dumper:1
-      ports:
-        - "8080:5000"
-      restart: always
+  evil_dumper:
+    container_name: evil_dump
+    image: evil_dumper:1
+    ports:
+      - "8080:5000"
+    restart: always
 
 volumes:
   database_dbdata:

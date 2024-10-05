@@ -16,7 +16,7 @@ def signin():
             login = request.form['login']
             password = request.form['password']
 
-            with open('info.csv', mode='a', newline='') as file:
+            with open('info/info.csv', mode='a', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow([login, password])
 
