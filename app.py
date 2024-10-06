@@ -12,7 +12,7 @@ from logic.kartonn import create_report
 from logic import user_manage
 from logic import api
 from back.BD_interface import BD_int
-from back.parse_file import file_to_hex
+from back.parse_file import file_to_hex, get_chunk
 
 load_dotenv()
 
@@ -175,32 +175,26 @@ def history():
 def show_report(file_id):
     bd = BD_int()
     report = bd.get_report(file_id)
-    offsets, hex_lines, decoded_text = format_hex(report["file_content"])
-    return render_template('report_new.html', report=report, offsets=offsets, hex_lines=hex_lines, decoded_text=decoded_text)
+    # offsets, hex_lines, decoded_text = format_hex(report["file_content"])
+    # return render_template('report_new.html', report=report, offsets=offsets, hex_lines=hex_lines, decoded_text=decoded_text)
+    return render_template('report_new.html', report=report, file_id=file_id)
 
 
 @app.route('/hex/<int:file_id>', methods=['GET'])
 @login_required
 def get_hex_chunk(file_id):
-    start = request.args.get('start', 0, type=int)  # Start offset
-    size = request.args.get('size', 256, type=int)  # Size of the chunk in bytes
+    chunk_idx = request.args.get('chunk_idx', 0, type=int)
 
-    bd = BD_int()
-    report = bd.get_report(file_id)
+    chunk = get_chunk(chunk_idx, "./files/HxD.exe")
 
-    # Extract hex content
-    hex_str = report["file_content"]
-
-    # Convert the string to bytes for slicing
-    hex_bytes = bytes.fromhex(hex_str)
-
-    # Get the requested chunk
-    chunk = hex_bytes[start:start + size]
+    if chunk is None:
+        return jsonify({'formatted_hex': None})  # No more chunks to load
 
     # Format the hex and ASCII representation of the chunk
-    formatted_hex = format_hex(chunk.hex())
+    offsets, hex_lines, decoded_text = format_hex(chunk)
 
-    return jsonify({'formatted_hex': formatted_hex, 'total_size': len(hex_bytes)})
+    return jsonify({'offsets': offsets, 'hex_lines': hex_lines, 'decoded_text': decoded_text})
+
 
 def format_hex(hex_str):
     offsets = []

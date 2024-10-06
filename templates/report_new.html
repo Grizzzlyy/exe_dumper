@@ -3,128 +3,216 @@
 {% block title %}Report{% endblock %}
 
 {% block content %}
-<h1>Report Details</h1>
-
-
-<div class="report-container">
-    <details class="dropdown">
-        <summary>General Information</summary>
-        <div class="dropdown-content">
-            <p><strong>Index:</strong> {{ report.idx }}</p>
-            <p><strong>Username:</strong> {{ report.username }}</p>
-            <p><strong>Filetype:</strong> {{ report.filetype }}</p>
+<div id="report_container">
+    <div id="report-info">
+        <div id="report-info-header">
+            <h2>Report info</h2>
         </div>
-    </details>
+        <div id="report-info-body">
+            <div id="general-information">
+                <details class="dropdown">
+                    <summary>General Information</summary>
+                    <div class="dropdown-content">
+                        <table>
+                            <tr>
+                                <td><strong>Index</strong></td>
+                                <!--                            <td>{{ report.idx }}</td>-->
+                                <td>Bruh =(</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Filetype</strong></td>
+                                <td>{{ report.filetype }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </details>
+            </div>
 
-    {% if report.filetype == "exe" %}
-        {% set fields = ['MS_DOS_header', 'PE_header', 'Import_table', 'Export_table'] %}
-    {% else %}
-        {% set fields = ['ELF_header', 'Segments', 'Sections', 'Symbols'] %}
-    {% endif %}
+            {% if report.filetype == "exe" %}
+            {% set fields = ['MS_DOS_header', 'PE_header', 'Import_table', 'Export_table'] %}
+            {% else %}
+            {% set fields = ['ELF_header', 'Segments', 'Sections', 'Symbols'] %}
+            {% endif %}
 
-    <details class="dropdown">
-        <summary> {{ fields[0] }} </summary>
-        <div class="dropdown-content">
-            {% for key, value in report[fields[0]].items() %}
-            <details>
-                <summary>{{ key }}</summary>
-                <div class="dropdown-content">
-                    <p><strong>Value:</strong> {{ value.value }}</p>
-                    <p><strong>Offset:</strong> {{ value.offset }}</p>
-                    <p><strong>Length:</strong> {{ value.length }}</p>
-                </div>
-            </details>
-            {% endfor %}
+            <div id="header-1">
+                <details class="dropdown">
+                    <summary> {{ fields[0] }}</summary>
+                    <div class="dropdown-content">
+                        {% for key, value in report[fields[0]].items() %}
+                        <details>
+                            <summary>{{ key }}</summary>
+                            <div class="dropdown-content">
+                                <table>
+                                    <tr>
+                                        <td><strong>Value</strong></td>
+                                        <td>{{ value.value }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </details>
+            </div>
+
+            <div id="header-2">
+                <details class="dropdown">
+                    <summary> {{ fields[1] }}</summary>
+                    <div class="dropdown-content">
+                        {% for key, value in report[fields[1]].items() %}
+                        <details>
+                            <summary>{{ key }}</summary>
+                            <div class="dropdown-content">
+                                <table>
+                                    <tr>
+                                        <td><strong>Value</strong></td>
+                                        <td>{{ value.value }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </details>
+            </div>
+
+            <div id="import-table">
+                <details class="dropdown">
+                    <summary> {{ fields[2] }}</summary>
+                    <div class="dropdown-content">
+                        {% for dll_name, functions in report[fields[2]].items() %}
+                        <details>
+                            <summary>{{ dll_name }}</summary>
+                            <div class="dropdown-content">
+                                {% for function in functions %}
+                                <details>
+                                    <summary>{{ function.function }}</summary>
+                                    <div class="dropdown-content">
+                                        <table>
+                                            <tr>
+                                                <td><strong>Address</strong></td>
+                                                <td>{{ function.address }}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </details>
+                                {% endfor %}
+                            </div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </details>
+            </div>
+
+            <div id="export-table">
+                <details class="dropdown">
+                    <summary> {{ fields[3] }}</summary>
+                    <div class="dropdown-content">
+                        <p>{{ report[fields[3]] | default('No export information available') }}</p>
+                    </div>
+                </details>
+            </div>
         </div>
-    </details>
 
-    <details class="dropdown">
-        <summary> {{ fields[1] }} </summary>
-        <div class="dropdown-content">
-            {% for key, value in report[fields[1]].items() %}
-            <details>
-                <summary>{{ key }}</summary>
-                <div class="dropdown-content">
-                    <p><strong>Value:</strong> {{ value.value }}</p>
-                    <p><strong>Offset:</strong> {{ value.offset }}</p>
-                    <p><strong>Length:</strong> {{ value.length }}</p>
-                </div>
-            </details>
-            {% endfor %}
-        </div>
-    </details>
 
-    <details class="dropdown">
-        <summary> {{ fields[2] }} </summary>
-        <div class="dropdown-content">
-            {% for dll_name, functions in report[fields[2]].items() %}
-            <details>
-                <summary>{{ dll_name }}</summary>
-                <div class="dropdown-content">
-                    {% for function in functions %}
-                    <details>
-                        <summary>{{ function.function }}</summary>
-                        <div class="dropdown-content">
-                            <p><strong>Address:</strong> {{ function.address }}</p>
-                            <p><strong>Offset:</strong> {{ function.offset }}</p>
-                            <p><strong>Length:</strong> {{ function.length }}</p>
-                        </div>
-                    </details>
-                    {% endfor %}
-                </div>
-            </details>
-            {% endfor %}
-        </div>
-    </details>
-
-    <details class="dropdown">
-        <summary> {{ fields[3] }} </summary>
-        <div class="dropdown-content">
-            <p>{{ report[fields[3]] | default('No export information available') }}</p>
-        </div>
-    </details>
-</div>
-
-<div class="hex-viewer-container">
-    <div class="hex-viewer-header">
-        <div class="header-offset">Offset (h)</div>
-        <div class="header-hex">Hex</div>
-        <div class="header-decoded">Decoded Text</div>
     </div>
-    <div class="hex-viewer-content">
-        <div class="offsets">
-            {% for offset in offsets %}
-                <div class="offset-line">{{ offset }}</div>
-            {% endfor %}
-        </div>
-        <div class="hex">
-            {% for hex_line in hex_lines %}
-                <div class="hex-line">{{ hex_line }}</div>
-            {% endfor %}
-        </div>
-        <div class="decoded-text">
-            {% for decoded in decoded_text %}
-                <div class="decoded-line">{{ decoded }}</div>
-            {% endfor %}
-        </div>
+
+    <div id="hex-view">
+        <h2>Hex Viewer</h2>
+
+        <table class="hex-view-table">
+            <thead class="hex-view-header">
+            <tr>
+                <th class="hex-view-header-item" id="offset-header">Offset (h)</th>
+                <th class="hex-view-header-item" id="hex-header">00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F</th>
+                <th class="hex-view-header-item" id="decoded-text-header">Decoded text</th>
+            </tr>
+            </thead>
+            <tbody class="hex-view-body">
+            <tr>
+                <td class="hex-view-body-item" id="offsets"></td>
+                <td class="hex-view-body-item" id="hex"></td>
+                <td class="hex-view-body-item" id="decoded-text"></td>
+            </tr>
+            </tbody>
+        </table>
+
     </div>
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const offsets = document.getElementById("offsets");
-        const hexContent = document.getElementById("hex-content");
-        const decodedText = document.getElementById("decoded-text");
+        const offsetsContainer = document.getElementById("offsets");
+        const hexContainer = document.getElementById("hex");
+        const decodedTextContainer = document.getElementById("decoded-text");
+        let chunkIndex = 0;
+        let loading = false;
 
-        function syncScroll(event) {
-            offsets.scrollTop = event.target.scrollTop;
-            hexContent.scrollTop = event.target.scrollTop;
-            decodedText.scrollTop = event.target.scrollTop;
+        function loadNextChunk() {
+        if (loading) return;
+        loading = true;
+
+        // Ensure the correct file_id is used in the fetch URL
+        const fileId = {{ file_id }};
+
+        fetch(`/hex/${fileId}?chunk_idx=${chunkIndex}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.offsets && data.hex_lines && data.decoded_text) {
+                    // Append new chunk to each part of the hex viewer
+                    data.offsets.forEach(offset => {
+                        const offsetElement = document.createElement("div");
+                        offsetElement.textContent = offset;
+                        offsetsContainer.appendChild(offsetElement);
+                    });
+
+                    data.hex_lines.forEach(hexLine => {
+                        const hexElement = document.createElement("div");
+                        hexElement.textContent = hexLine;
+                        hexContainer.appendChild(hexElement);
+                    });
+
+                    data.decoded_text.forEach(decoded => {
+                        const decodedElement = document.createElement("div");
+                        decodedElement.textContent = decoded;
+                        decodedTextContainer.appendChild(decodedElement);
+                    });
+
+                    chunkIndex++; // Increase the chunk index for the next load
+                }
+                loading = false;
+            })
+            .catch(error => {
+                console.error("Error loading hex chunk:", error);
+                loading = false;
+            });
         }
 
-        offsets.addEventListener("scroll", syncScroll);
-        hexContent.addEventListener("scroll", syncScroll);
-        decodedText.addEventListener("scroll", syncScroll);
+
+        // Event listener for scrolling
+        const hexViewBody = document.querySelector('.hex-view-body');
+        hexViewBody.addEventListener("scroll", function () {
+            if (hexViewBody.scrollTop + hexViewBody.clientHeight >= hexViewBody.scrollHeight - 10) {
+                loadNextChunk(); // Load next chunk when reaching the bottom
+            }
+        });
+
+        // Initial load
+        loadNextChunk();
     });
+
+
+
+
+
+
+
 </script>
+
+
 {% endblock %}
