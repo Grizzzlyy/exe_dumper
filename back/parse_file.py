@@ -30,10 +30,11 @@ def file_to_hex(file_content):
 
 def get_chunk(chunk_number,filename):
 
-    chunk_size = int(os.getenv('CHUNK_SIZE'))
+    CHUNK_SIZE = int(os.getenv("CHUNK_SIZE"))
+    chunk_size = CHUNK_SIZE
     f_size = os.path.getsize(filename)
 
-    if chunk_number * (chunk_size) > f_size:
+    if chunk_number * (chunk_size) >= f_size:
         return None
     
     elif (chunk_number+1) * chunk_size > f_size:
@@ -41,15 +42,14 @@ def get_chunk(chunk_number,filename):
 
     try:
         with open(filename,'r+b') as f:
-            f.seek(chunk_size*chunk_number,0)
             chunk = str()
-
-            with mmap.mmap(fileno=f.fileno(),length=chunk_size,access=mmap.ACCESS_READ) as mm:
-                chunk = mm.read(chunk_size).hex()
+            with mmap.mmap(fileno=f.fileno(),length=0,access=mmap.ACCESS_READ) as mm:
+                chunk = mm[CHUNK_SIZE*chunk_number:CHUNK_SIZE*chunk_number+chunk_size].hex()
 
             f.close()
             return chunk
     except Exception as e:
+        print(e)
         logging.info(e)
 
 def write_changes_to_file(offset,str_,str_len,filename):
@@ -58,4 +58,3 @@ def write_changes_to_file(offset,str_,str_len,filename):
         with mmap.mmap(of.fileno(),length=str_len,access=mmap.ACCESS_WRITE) as mm:
             mm[:str_len] = str_
             mm.flush()
-            
