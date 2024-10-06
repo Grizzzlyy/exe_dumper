@@ -101,8 +101,21 @@
                                     <div class="dropdown-content">
                                         <table>
                                             <tr>
-                                                <td><strong>Address</strong></td>
-                                                <td>{{ function.address }}</td>
+                                                <td>
+                                                    <a href="#{{ function.name_offset & 0xFFFFFFFF0 }}" class="hex-link"
+                                                       offset="{{ function.name_offset }}"
+                                                       length="{{function.name_length}}"><strong>name_offset</strong></a>
+                                                </td>
+                                                <td>{{ function.name_offset }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a href="#{{ function.rva_offset_offset & 0xFFFFFFFF0 }}"
+                                                       class="hex-link"
+                                                       offset="{{ function.rva_offset_offset }}"
+                                                       length="{{function.rva_offset_length}}"><strong>rva_offset</strong></a>
+                                                </td>
+                                                <td>{{ function.rva_offset_offset }}</td>
                                             </tr>
                                         </table>
                                     </div>
@@ -299,6 +312,8 @@
             });
         });
     });
+
+
 
 
 
