@@ -89,13 +89,15 @@ def parse_imports(pe):
 
                 # Получаем смещение (offset) в файле на основе виртуального адреса (RVA)
                 function_offset = pe.get_offset_from_rva(function_rva - pe.OPTIONAL_HEADER.ImageBase)
-
+                salam = 0
                 # Сохраняем информацию о функции в словарь
                 imports_data[lib_name].append({
                     'function': func_name,
-                    'address': hex(function_rva),        # Виртуальный адрес
-                    'offset': hex(function_offset),       # Смещение в файле
-                    'length': length
+                    'name_offset': imp.name_offset,
+                    'name_length': len(func_name),
+                    'rva_offset':imp.hint_name_table_rva,
+                    'rva_offset_offset':imp.ordinal_offset,
+                    'rva_offset_length':length
                 })
     
     return imports_data
