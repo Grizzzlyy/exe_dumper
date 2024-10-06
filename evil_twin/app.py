@@ -40,7 +40,7 @@ def oops():
 
 if __name__ == '__main__':
     conn = psycopg2.connect(
-        host="localhost",
+        host="51.250.114.148",
         port="5432",
         database="evil",
         user="evil_user",
