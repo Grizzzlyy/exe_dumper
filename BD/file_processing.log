@@ -157,3 +157,60 @@
 2024-10-05 20:08:42,943 - INFO - 127.0.0.1 - - [05/Oct/2024 20:08:42] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
 2024-10-05 20:17:13,979 - INFO -  * Detected change in 'C:\\Users\\James\\Documents\\_my_docs\\Education\\8_sem\\BIP\\code\\exe_dumper\\app.py', reloading
 2024-10-05 20:24:49,654 - INFO -  * Detected change in 'C:\\Users\\James\\Documents\\_my_docs\\Education\\8_sem\\BIP\\code\\exe_dumper\\app.py', reloading
+2024-10-05 22:14:09,647 - INFO - 127.0.0.1 - - [05/Oct/2024 22:14:09] "GET /hex/2 HTTP/1.1" 200 -
+2024-10-05 22:14:09,934 - INFO - 127.0.0.1 - - [05/Oct/2024 22:14:09] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 22:14:10,143 - INFO - 127.0.0.1 - - [05/Oct/2024 22:14:10] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-05 22:14:10,168 - INFO - 127.0.0.1 - - [05/Oct/2024 22:14:10] "[33mGET /hex/?chunk_idx=0 HTTP/1.1[0m" 404 -
+2024-10-05 22:14:58,510 - INFO -  * Detected change in 'C:\\Users\\James\\Documents\\_my_docs\\Education\\8_sem\\BIP\\code\\exe_dumper\\app.py', reloading
+2024-10-05 22:15:04,537 - INFO - 127.0.0.1 - - [05/Oct/2024 22:15:04] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 22:15:04,723 - INFO - 127.0.0.1 - - [05/Oct/2024 22:15:04] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-05 22:15:04,755 - INFO - 127.0.0.1 - - [05/Oct/2024 22:15:04] "[33mGET /hex/?chunk_idx=0 HTTP/1.1[0m" 404 -
+2024-10-05 22:17:22,350 - INFO - 127.0.0.1 - - [05/Oct/2024 22:17:22] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-05 22:18:46,806 - INFO -  * Detected change in 'C:\\Users\\James\\Documents\\_my_docs\\Education\\8_sem\\BIP\\code\\exe_dumper\\app.py', reloading
+2024-10-05 22:20:16,866 - INFO - 127.0.0.1 - - [05/Oct/2024 22:20:16] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 22:20:17,072 - INFO - 127.0.0.1 - - [05/Oct/2024 22:20:17] "GET /static/css/styles.css HTTP/1.1" 200 -
+2024-10-05 22:20:17,104 - INFO - 127.0.0.1 - - [05/Oct/2024 22:20:17] "[33mGET /hex/?chunk_idx=0 HTTP/1.1[0m" 404 -
+2024-10-05 22:20:44,349 - INFO - 127.0.0.1 - - [05/Oct/2024 22:20:44] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-05 22:22:35,783 - INFO - 127.0.0.1 - - [05/Oct/2024 22:22:35] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 22:22:35,914 - INFO - 127.0.0.1 - - [05/Oct/2024 22:22:35] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-05 22:22:35,931 - INFO - 127.0.0.1 - - [05/Oct/2024 22:22:35] "[33mGET /hex/?chunk_idx=0 HTTP/1.1[0m" 404 -
+2024-10-05 22:25:41,630 - INFO - 127.0.0.1 - - [05/Oct/2024 22:25:41] "GET /hex/2 HTTP/1.1" 200 -
+2024-10-05 22:26:25,850 - INFO - 127.0.0.1 - - [05/Oct/2024 22:26:25] "GET /hex/2 HTTP/1.1" 200 -
+2024-10-05 22:27:05,071 - INFO - 127.0.0.1 - - [05/Oct/2024 22:27:05] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 22:27:05,126 - INFO - 127.0.0.1 - - [05/Oct/2024 22:27:05] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-05 22:28:19,890 - INFO - 127.0.0.1 - - [05/Oct/2024 22:28:19] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
+2024-10-05 22:28:26,022 - INFO - 127.0.0.1 - - [05/Oct/2024 22:28:26] "GET /hex/2?chunk_idx=1 HTTP/1.1" 200 -
+2024-10-05 22:29:09,611 - INFO - 127.0.0.1 - - [05/Oct/2024 22:29:09] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-05 22:29:28,562 - INFO - 127.0.0.1 - - [05/Oct/2024 22:29:28] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 22:29:28,625 - INFO - 127.0.0.1 - - [05/Oct/2024 22:29:28] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-05 22:35:11,418 - INFO -  * Detected change in 'C:\\Users\\James\\Documents\\_my_docs\\Education\\8_sem\\BIP\\code\\exe_dumper\\app.py', reloading
+2024-10-05 22:35:21,493 - INFO - 127.0.0.1 - - [05/Oct/2024 22:35:21] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 22:35:21,712 - INFO - 127.0.0.1 - - [05/Oct/2024 22:35:21] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-05 22:35:27,208 - INFO - 127.0.0.1 - - [05/Oct/2024 22:35:27] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
+2024-10-05 22:37:44,840 - INFO - 127.0.0.1 - - [05/Oct/2024 22:37:44] "GET /static/css/styles.css HTTP/1.1" 200 -
+2024-10-05 22:46:32,944 - INFO - 127.0.0.1 - - [05/Oct/2024 22:46:32] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 22:46:32,991 - INFO - 127.0.0.1 - - [05/Oct/2024 22:46:32] "GET /static/css/styles.css HTTP/1.1" 200 -
+2024-10-05 22:46:33,902 - INFO - 127.0.0.1 - - [05/Oct/2024 22:46:33] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
+2024-10-05 22:46:49,770 - INFO - 127.0.0.1 - - [05/Oct/2024 22:46:49] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-05 22:50:14,979 - INFO - 127.0.0.1 - - [05/Oct/2024 22:50:14] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 22:50:15,046 - INFO - 127.0.0.1 - - [05/Oct/2024 22:50:15] "GET /static/css/styles.css HTTP/1.1" 200 -
+2024-10-05 22:50:15,808 - INFO - 127.0.0.1 - - [05/Oct/2024 22:50:15] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
+2024-10-05 22:51:32,113 - INFO - 127.0.0.1 - - [05/Oct/2024 22:51:32] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 22:51:32,168 - INFO - 127.0.0.1 - - [05/Oct/2024 22:51:32] "GET /static/css/styles.css HTTP/1.1" 200 -
+2024-10-05 22:51:32,912 - INFO - 127.0.0.1 - - [05/Oct/2024 22:51:32] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
+2024-10-05 22:53:38,809 - INFO - 127.0.0.1 - - [05/Oct/2024 22:53:38] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 22:53:38,862 - INFO - 127.0.0.1 - - [05/Oct/2024 22:53:38] "GET /static/css/styles.css HTTP/1.1" 200 -
+2024-10-05 22:53:38,941 - INFO - 127.0.0.1 - - [05/Oct/2024 22:53:38] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
+2024-10-05 22:53:46,562 - INFO - 127.0.0.1 - - [05/Oct/2024 22:53:46] "GET /hex/2?chunk_idx=1 HTTP/1.1" 200 -
+2024-10-05 22:53:49,440 - INFO - 127.0.0.1 - - [05/Oct/2024 22:53:49] "GET /hex/2?chunk_idx=2 HTTP/1.1" 200 -
+2024-10-05 23:01:13,966 - INFO - 127.0.0.1 - - [05/Oct/2024 23:01:13] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 23:01:14,031 - INFO - 127.0.0.1 - - [05/Oct/2024 23:01:14] "GET /static/css/styles.css HTTP/1.1" 200 -
+2024-10-05 23:01:14,105 - INFO - 127.0.0.1 - - [05/Oct/2024 23:01:14] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
+2024-10-05 23:01:31,559 - INFO - 127.0.0.1 - - [05/Oct/2024 23:01:31] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 23:01:31,635 - INFO - 127.0.0.1 - - [05/Oct/2024 23:01:31] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-05 23:01:31,674 - INFO - 127.0.0.1 - - [05/Oct/2024 23:01:31] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
+2024-10-05 23:02:15,481 - INFO - 127.0.0.1 - - [05/Oct/2024 23:02:15] "GET /hex/2?chunk_idx=1 HTTP/1.1" 200 -
+2024-10-05 23:02:16,419 - INFO - 127.0.0.1 - - [05/Oct/2024 23:02:16] "GET /hex/2?chunk_idx=2 HTTP/1.1" 200 -
+2024-10-05 23:03:57,050 - INFO - 127.0.0.1 - - [05/Oct/2024 23:03:57] "GET /report/2 HTTP/1.1" 200 -
+2024-10-05 23:03:57,110 - INFO - 127.0.0.1 - - [05/Oct/2024 23:03:57] "GET /static/css/styles.css HTTP/1.1" 200 -
+2024-10-05 23:03:57,154 - INFO - 127.0.0.1 - - [05/Oct/2024 23:03:57] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -

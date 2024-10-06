@@ -8,12 +8,14 @@ body {
     background-color: #f4f4f4;
 }
 
-h2 {
-    text-align: center; /* Center the text */
+h1 {
+
+text-align: center;
+
 }
 
-.content {
-    margin: 20px;
+h2 {
+    text-align: center; /* Center the text */
 }
 
 /* Navigation bar */
@@ -96,128 +98,104 @@ form button:hover {
     background-color: #575757; /* Darker on hover */
 }
 
-/* Table Styles */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-table th, table td {
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-    color: #333;
-}
-
-table td {
-    background-color: #fafafa;
-}
-
-table tr:nth-child(even) td {
-    background-color: #f9f9f9;
-}
-
-table tr:hover td {
-    background-color: #f1f1f1;
-}
-
-table a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-table a:hover {
-    text-decoration: underline;
-}
-
 .signin-container h2,
 .signin-container p {
     text-align: center; /* Center the text */
 }
 
-.dropdown {
-    margin: 10px 0;
+/* Table Styles */
+#report-info-body table, th, td {
+    border: 1px solid black;
 }
+
+#report-info-body table {
+    width: auto;
+}
+
+
+/* Report */
+#report_container {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Optional: space out the items */
+    border-top: 2px solid #000;
+}
+
+#report_container h2 {
+    border-bottom: 2px solid #000;
+}
+
+#report-info {
+    flex: 0 1 20%; /* Allow this section to take available space */
+ /* Optional: add some space between the sections */
+    border-right: 2px solid #000; /* Add a right border */
+}
+
+#report-info-body {
+    padding: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
 .dropdown-content {
     margin-left: 20px;
 }
-summary {
-    cursor: pointer;
-    font-weight: bold;
+
+
+/* Hex view */
+#hex-view {
+    flex: 1; /* Allow this section to take available space */
 }
 
-.hex-viewer-container {
-    display: flex;
-    flex-direction: column;
-    font-family: monospace; /* Make sure all text is in a monospace font */
+.hex-view-table {
+    display: grid;
+    font-family: monospace;
+    width: 10em; /* Make the table take full width */
+    border-collapse: collapse; /* Merge borders */
 }
 
-.hex-viewer-header {
-    display: flex;
-    font-weight: bold;
-    position: sticky;
-    top: 0;
-    background-color: #f0f0f0;
+.hex-view-header,
+.hex-view-body {
+
+    justify-content: space-between; /* Distribute space between items */
+    align-items: stretch; /* Align items vertically in the center */
 }
 
-.header-offset, .header-hex, .header-decoded {
-    padding: 2px 5px; /* Reduce padding to make the gap smaller */
-    border-bottom: 1px solid #ccc;
+.hex-view-body {
+    display: block; /* Allow the body to behave like a block element */
+    max-height: 500px; /* Set a max height for the body */
+    overflow-y: auto; /* Enable vertical scrolling */
 }
 
-.header-offset {
-    width: 10%;
-    text-align: left;
+
+.hex-view-header-item,
+.hex-view-body-item {
+    flex: 1; /* Allow each section to take equal space */
+    overflow: hidden; /* Hide overflow if content is too large */
+    white-space: nowrap; /* Prevent wrapping of content */
+    text-overflow: ellipsis; /* Optional: add ellipsis for overflowed text */
+    padding: 10px; /* Optional: Add padding for consistency */
+    border: 2px solid transparent; /* Add transparent border for alignment */
 }
 
-.header-hex {
-    width: 50%;
-    text-align: left;
+
+.hex-view-header-item {
+    border-bottom: 2px solid #000; /* Add bottom border to header items for separation */
 }
 
-.header-decoded {
-    width: 40%;
-    text-align: left;
+.hex-view-body-item {
+    flex: 1; /* Allow each section to take equal space */
+    overflow: hidden; /* Hide overflow if content is too large */
+    white-space: nowrap; /* Prevent wrapping of content */
+    text-overflow: ellipsis; /* Optional: add ellipsis for overflowed text */
+    border-top: none; /* Remove top border for body items to avoid double border */
 }
 
-.hex-viewer-content {
-    display: flex;
-    overflow-y: auto;
-    height: 400px; /* Adjust as needed */
+.hex-view-table th, .hex-view-table td {
+    border: 2px solid #000; /* Border for table cells */
+    padding: 10px; /* Padding for spacing */
+    text-align: left; /* Align text to the left */
+    width: 33.33%; /* Make each cell take equal width */
 }
 
-.offsets, .hex, .decoded-text {
-    display: flex;
-    flex-direction: column;
-}
 
-.offsets {
-    width: 10%;
-}
 
-.hex {
-    width: 50%;
-}
-
-.decoded-text {
-    width: 40%;
-}
-
-.offset-line, .hex-line, .decoded-line {
-    padding: 2px 5px; /* Reduce padding */
-    white-space: pre;
-    font-family: monospace; /* Ensure monospace for all lines */
-}
-
-.hex-viewer-header, .offset-line, .hex-line, .decoded-line {
-    margin: 0; /* Remove unnecessary margins */
-}
