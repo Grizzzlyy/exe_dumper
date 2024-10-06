@@ -43,7 +43,7 @@ def parse_pe_header(pe):
     tmp_dict = {}
     for field in pe.FILE_HEADER.__keys__:
         field_value = getattr(pe.FILE_HEADER, field[0])
-        offset = pe.FILE_HEADER.__file_offset__ + pe.FILE_HEADER.get_field_absolute_offset(field[0])
+        offset = pe.FILE_HEADER.get_field_absolute_offset(field[0])
 
         offsets_list.append(offset)        #save offset to list to count field_len
         value = field_value
