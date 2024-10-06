@@ -101,8 +101,26 @@
                                     <div class="dropdown-content">
                                         <table>
                                             <tr>
+<<<<<<< HEAD
                                                 <td><strong>Address</strong></td>
                                                 <td>{{ function.address }}</td>
+=======
+                                                <td>
+                                                    <a href="#{{ function.g_name_offset }}" class="hex-link"
+                                                       offset="{{ function.name_offset }}"
+                                                       length="{{function.name_length}}"><strong>name_offset</strong></a>
+                                                </td>
+                                                <td>{{ function.name_offset }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a href="#{{ function.g_rva_offset_offset }}"
+                                                       class="hex-link"
+                                                       offset="{{ function.rva_offset_offset }}"
+                                                       length="{{function.rva_offset_length}}"><strong>rva_offset</strong></a>
+                                                </td>
+                                                <td>{{ function.rva_offset_offset }}</td>
+>>>>>>> 83f24ae (before improving dynamic chunk loading)
                                             </tr>
                                         </table>
                                     </div>
@@ -158,49 +176,50 @@
         const decodedTextContainer = document.getElementById("decoded-text");
         let chunkIndex = 0;
         let loading = false;
+        let loadedChunks = new Set();  // Track loaded chunks
 
         function loadNextChunk() {
-        if (loading) return;
-        loading = true;
+            if (loading) return;
+            loading = true;
 
-        // Ensure the correct file_id is used in the fetch URL
-        const fileId = {{ file_id }};
+            // Ensure the correct file_id is used in the fetch URL
+            const fileId = {{ file_id }};
 
-        fetch(`/hex/${fileId}?chunk_idx=${chunkIndex}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.offsets && data.hex_lines && data.decoded_text) {
-                    // Append new chunk to each part of the hex viewer
-                    data.offsets.forEach((offset, index) => {
-                        const offsetElement = document.createElement("div");
-                        offsetElement.textContent = offset;
-                        offsetsContainer.appendChild(offsetElement);
+            fetch(`/hex/${fileId}?chunk_idx=${chunkIndex}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.offsets && data.hex_lines && data.decoded_text) {
+                        // Append new chunk to each part of the hex viewer
+                        data.offsets.forEach((offset, index) => {
+                            const offsetElement = document.createElement("div");
+                            offsetElement.textContent = offset;
+                            offsetsContainer.appendChild(offsetElement);
 
-                        const hexElement = document.createElement("div");
-                        hexElement.textContent = data.hex_lines[index];
-                        hexElement.id = offset;  // Assign the offset as the id of the hex element
-                        hexContainer.appendChild(hexElement);
-                    });
+                            const hexElement = document.createElement("div");
+                            hexElement.textContent = data.hex_lines[index];
+                            hexElement.id = offset;  // Assign the offset as the id of the hex element
+                            hexContainer.appendChild(hexElement);
+                        });
 
-                    data.decoded_text.forEach(decoded => {
-                        const decodedElement = document.createElement("div");
-                        decodedElement.textContent = decoded;
-                        decodedTextContainer.appendChild(decodedElement);
-                    });
+                        data.decoded_text.forEach(decoded => {
+                            const decodedElement = document.createElement("div");
+                            decodedElement.textContent = decoded;
+                            decodedTextContainer.appendChild(decodedElement);
+                        });
 
-                    chunkIndex++; // Increase the chunk index for the next load
-                }
-                loading = false;
-            })
-            .catch(error => {
-                console.error("Error loading hex chunk:", error);
-                loading = false;
-            });
+                        chunkIndex++; // Increase the chunk index for the next load
+                    }
+                    loading = false;
+                })
+                .catch(error => {
+                    console.error("Error loading hex chunk:", error);
+                    loading = false;
+                });
         }
 
 
