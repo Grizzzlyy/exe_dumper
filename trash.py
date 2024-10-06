@@ -1,18 +1,66 @@
-def format_hex(hex_str):
-    hex_lines = []
-    bytes_per_line = 16
+elements = {
+    "000000000": "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
+    "000000020": "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
+    "000000030": "00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00",
+    "000000040": "ba 10 00 0e 1f b4 09 cd 21 b8 01 4c cd 21 90 90"
+}
 
-    for i in range(0, len(hex_str), bytes_per_line * 2):
-        offset = f"{i // 2:08X}"
-        hex_bytes = [hex_str[j:j+2] for j in range(i, min(i + bytes_per_line * 2, len(hex_str)), 2)]
-        hex_section = ' '.join(hex_bytes)
-        ascii_section = ''.join([chr(int(b, 16)) if 32 <= int(b, 16) <= 126 else '.' for b in hex_bytes])
-        hex_lines.append(f"{offset}  {hex_section:<47}  {ascii_section}")
 
-    return hex_lines
+def create_to_color(offset, total_length):
+    init_pos = offset % 16
+    init_offset = f"{offset - init_pos :09X}"
+    if total_length <= 16 - init_pos:
+        init_len = total_length
+    else:
+        init_len = 16 - init_pos
+    total_length -= init_len
+    idx = 1
 
-with open("file_content.txt", "r") as fp:
-    hex_ = fp.read()
-formatted_hex = format_hex(hex_)
+    to_color = [
+        {"offset": init_offset,
+         "pos": init_pos,
+         "len": init_len}
+    ]
 
-pass
+    while total_length > 0:
+        pos = 0
+        offset = f"{int(to_color[idx - 1]['offset'], 16) + 16  :09X}"
+        len = 16 if total_length >= 16 else total_length
+
+        total_length -= len
+        idx += 1
+
+        to_color.append({"offset": offset,
+                         "pos": pos,
+                         "len": len})
+
+    return to_color
+
+
+def color_element(to_color_dict, element):
+    bytes_ = element.split(" ")
+    before_colored = ' '.join(bytes_[:row_dict["pos"]])
+    after_colored = ' '.join(bytes_[row_dict["pos"] + row_dict["len"]:])
+    colored = f"""<span style="background-color: yellow;">{" ".join(bytes_[row_dict["pos"]:row_dict["pos"] + row_dict["len"]])}</span>"""
+    res = colored
+    if before_colored != '':
+        res = before_colored + ' '+ res
+    if after_colored != '':
+        res = res + ' ' + after_colored
+
+    return res
+
+
+if __name__ == "__main__":
+    # Test data
+    offset = 0x2
+    total_length = 2
+
+    to_color = create_to_color(offset, total_length)
+
+    for row_dict in to_color:
+        element = elements[row_dict["offset"]]
+        colored_element = color_element(row_dict, element)
+        print(colored_element)
+
+    pass
