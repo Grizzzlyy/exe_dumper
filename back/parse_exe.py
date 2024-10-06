@@ -120,7 +120,7 @@ def parse_exports(pe):
                 func_name = exp.name.decode('utf-8')
             else:
                 # Если у функции нет имени, используем её порядковый номер (ordinal)
-                func_name = f'Ordinal{exp.ordinal}'
+                continue
 
             # Получаем виртуальный адрес (RVA) функции
             function_rva = exp.address
@@ -131,9 +131,11 @@ def parse_exports(pe):
             # Сохраняем информацию о функции в словарь
             exports_data[lib_name].append({
                 'function': func_name,
-                'address': hex(function_rva),        # Виртуальный адрес
-                'offset': hex(function_offset),       # Смещение в файле
-                'length': length
+                'name_offset': exp.name_offset,
+                'name_length': len(func_name),
+                'rva_offset':exp.address,
+                'rva_offset_offset':exp.address_offset,
+                'rva_offset_length':length
             })
     
     return exports_data
