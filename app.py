@@ -13,6 +13,7 @@ from logic import user_manage
 from logic import api
 from back.BD_interface import BD_int
 from back.parse_file import file_to_hex, get_chunk
+from logic.frontend import get_report
 
 load_dotenv()
 
@@ -173,8 +174,7 @@ def history():
 @app.route('/report/<int:file_id>', methods=['GET', 'POST'])
 @login_required
 def show_report(file_id):
-    bd = BD_int()
-    report = bd.get_report(file_id)
+    report = get_report(file_id)
     # offsets, hex_lines, decoded_text = format_hex(report["file_content"])
     # return render_template('report_new.html', report=report, offsets=offsets, hex_lines=hex_lines, decoded_text=decoded_text)
     return render_template('report_new.html', report=report, file_id=file_id)

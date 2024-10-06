@@ -112,6 +112,10 @@ form button:hover {
     width: auto;
 }
 
+.dropdown-content table {
+    border-collapse: collapse;
+}
+
 
 /* Report */
 #report_container {
@@ -125,20 +129,25 @@ form button:hover {
 }
 
 #report-info {
-    flex: 0 1 20%; /* Allow this section to take available space */
+    /* flex: 0 1 20%; */
  /* Optional: add some space between the sections */
     border-right: 2px solid #000; /* Add a right border */
 }
 
 #report-info-body {
     padding: 10px;
-    max-height: 500px;
+    height: 575px;
     overflow-y: auto;
 }
 
 .dropdown-content {
     margin-left: 20px;
 }
+
+summary {
+    padding-bottom: 2px;
+}
+
 
 
 /* Hex view */
@@ -149,21 +158,19 @@ form button:hover {
 .hex-view-table {
     display: grid;
     font-family: monospace;
-    width: 10em; /* Make the table take full width */
-    border-collapse: collapse; /* Merge borders */
+    width: fit-content;
+    border-collapse: collapse;
 }
 
 .hex-view-header,
 .hex-view-body {
-
-    justify-content: space-between; /* Distribute space between items */
-    align-items: stretch; /* Align items vertically in the center */
+    display: table-row-group; /* Make header and body behave like parts of a table */
 }
 
 .hex-view-body {
     display: block; /* Allow the body to behave like a block element */
-    max-height: 500px; /* Set a max height for the body */
     overflow-y: auto; /* Enable vertical scrolling */
+    height: 550px;
 }
 
 
@@ -173,7 +180,6 @@ form button:hover {
     overflow: hidden; /* Hide overflow if content is too large */
     white-space: nowrap; /* Prevent wrapping of content */
     text-overflow: ellipsis; /* Optional: add ellipsis for overflowed text */
-    padding: 10px; /* Optional: Add padding for consistency */
     border: 2px solid transparent; /* Add transparent border for alignment */
 }
 
@@ -192,10 +198,15 @@ form button:hover {
 
 .hex-view-table th, .hex-view-table td {
     border: 2px solid #000; /* Border for table cells */
-    padding: 10px; /* Padding for spacing */
     text-align: left; /* Align text to the left */
-    width: 33.33%; /* Make each cell take equal width */
 }
 
+#offsets, #offset-header {
+    width: 72px;
+}
+
+#decoded-text, #decoded-text-header {
+    width: 116px;
+}
 
 
