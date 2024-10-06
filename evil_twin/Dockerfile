@@ -3,5 +3,6 @@ RUN mkdir /app
 WORKDIR /app
 COPY . /app
 RUN pip install -r requirements.txt
+#RUN apt install libpq-dev python3-dev
 EXPOSE 8080
 ENTRYPOINT ["python3", "app.py"]
