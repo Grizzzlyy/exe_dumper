@@ -16,8 +16,7 @@
                         <table>
                             <tr>
                                 <td><strong>Index</strong></td>
-                                <!--                            <td>{{ report.idx }}</td>-->
-                                <td>Bruh =(</td>
+                                <td>{{ report.idx }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Filetype</strong></td>
@@ -29,16 +28,22 @@
             </div>
 
             {% if report.filetype == "exe" %}
-            {% set fields = ['MS_DOS_header', 'PE_header', 'Import_table', 'Export_table'] %}
+            {% set fields_mapping = { "header_first": "MS_DOS_header",
+            "header_second": "PE_header",
+            "import_table": "Import_table",
+            "export_table": "Export_table"} %}
             {% else %}
-            {% set fields = ['ELF_header', 'Segments', 'Sections', 'Symbols'] %}
+            {% set fields_mapping = { "header_first": "ELF_header",
+            "header_second": "Segments",
+            "import_table": "Sections",
+            "export_table": "Symbols"} %}
             {% endif %}
 
             <div id="header-1">
                 <details class="dropdown">
-                    <summary> {{ fields[0] }}</summary>
+                    <summary> {{ fields_mapping["header_first"] }}</summary>
                     <div class="dropdown-content">
-                        {% for key, value in report[fields[0]].items() %}
+                        {% for key, value in report["header_first"].items() %}
                         <details>
                             <summary>{{ key }}</summary>
                             <div class="dropdown-content">
@@ -59,9 +64,9 @@
 
             <div id="header-2">
                 <details class="dropdown">
-                    <summary> {{ fields[1] }}</summary>
+                    <summary> {{ fields_mapping["header_second"] }}</summary>
                     <div class="dropdown-content">
-                        {% for key, value in report[fields[1]].items() %}
+                        {% for key, value in report["header_second"].items() %}
                         <details>
                             <summary>{{ key }}</summary>
                             <div class="dropdown-content">
@@ -80,9 +85,9 @@
 
             <div id="import-table">
                 <details class="dropdown">
-                    <summary> {{ fields[2] }}</summary>
+                    <summary> {{ fields_mapping["import_table"] }}</summary>
                     <div class="dropdown-content">
-                        {% for dll_name, functions in report[fields[2]].items() %}
+                        {% for dll_name, functions in report["import_table"].items() %}
                         <details>
                             <summary>{{ dll_name }}</summary>
                             <div class="dropdown-content">
@@ -108,9 +113,9 @@
 
             <div id="export-table">
                 <details class="dropdown">
-                    <summary> {{ fields[3] }}</summary>
+                    <summary> {{ fields_mapping["export_table"] }}</summary>
                     <div class="dropdown-content">
-                        <p>{{ report[fields[3]] | default('No export information available') }}</p>
+                        <p>{{ report["export_table"] | default('No export information available') }}</p>
                     </div>
                 </details>
             </div>
@@ -207,6 +212,7 @@
         // Initial load
         loadNextChunk();
     });
+
 
 </script>
 
