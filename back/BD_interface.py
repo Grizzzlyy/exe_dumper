@@ -124,27 +124,17 @@ class BD_int():
     def get_report(self, file_id):
         self.conn.row_factory = sqlite3.Row  # gets strings as a dict
         self.cursor = self.conn.cursor()
-        subd_answer = self.cursor.execute(f'SELECT * FROM files WHERE idx = {file_id}').fetchone()
+        report = self.cursor.execute(f'SELECT * FROM files WHERE idx = {file_id}').fetchone()
 
         self.conn.close()
-        report = dict()
-        if subd_answer is not None:
-            subd_answer = dict(subd_answer)
-            report['filetype'] = subd_answer['filetype']
-            report['filename'] = subd_answer['file_name']
-            if subd_answer['filetype'] == 'exe':
-                report['MS_DOS_header'] = json.loads(subd_answer['header_first'])
-                report['PE_header'] = json.loads(subd_answer['header_second'])
-                report['Import_table'] = json.loads(subd_answer['import_table'])
-                report['Export_table'] = json.loads(subd_answer['export_table'])
-            else:
-                report['ELF_header'] = json.loads(subd_answer['header_first'])
-                report['Segments'] = json.loads(subd_answer['header_second'])
-                report['Sections'] = json.loads(subd_answer['import_table'])
-                report['Symbols'] = json.loads(subd_answer['export_table'])
 
-            file_content = get_chunk(0,'files/' + subd_answer['file_name'])
-            report["file_content"] = file_content
+        if report is not None:
+            report = dict(report)
+            del report["username"]
+            json_fields = ["header_first", "header_second", "import_table", "export_table"]
+            for k in json_fields:
+                report[k] = json.loads(report[k])
+
         return report
 
     def __del__(self):

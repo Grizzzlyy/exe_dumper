@@ -6,14 +6,14 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from flask_login import LoginManager, UserMixin, login_required, logout_user, current_user, login_user
 
 from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, send_otp_code
-from logic.db_reports import get_report
+# from logic.db_reports import get_report
 from logic.db_users import get_user_info, add_user
 from logic.kartonn import create_report
 from logic import user_manage
 from logic import api
 from back.BD_interface import BD_int
 from back.parse_file import file_to_hex, get_chunk
-from logic.frontend import get_report
+from logic.frontend import get_report_info
 
 load_dotenv()
 
@@ -174,7 +174,7 @@ def history():
 @app.route('/report/<int:file_id>', methods=['GET', 'POST'])
 @login_required
 def show_report(file_id):
-    report = get_report(file_id)
+    report = get_report_info(file_id)
     # offsets, hex_lines, decoded_text = format_hex(report["file_content"])
     # return render_template('report_new.html', report=report, offsets=offsets, hex_lines=hex_lines, decoded_text=decoded_text)
     return render_template('report_new.html', report=report, file_id=file_id)
