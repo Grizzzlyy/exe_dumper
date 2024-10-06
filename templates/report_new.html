@@ -44,7 +44,9 @@
                             <div class="dropdown-content">
                                 <table>
                                     <tr>
-                                        <td><strong>Value</strong></td>
+                                        <td>
+                                            <a href="{{ value.offset }}"><strong>Value</strong></a>
+                                        </td>
                                         <td>{{ value.value }}</td>
                                     </tr>
                                 </table>
@@ -205,12 +207,6 @@
         // Initial load
         loadNextChunk();
     });
-
-
-
-
-
-
 
 </script>
 
