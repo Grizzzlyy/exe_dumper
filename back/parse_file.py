@@ -51,8 +51,11 @@ def get_chunk(chunk_number,filename):
             return chunk
     except Exception as e:
         logging.info(e)
-        
-def write_changes_to_file(offset,str,str_len,filename):
-    with open(filename,'wb') as outfile:
-        file_desc = outfile.fileno()
-        mmaped_file = mmap.mmap(file_desc,1)
+
+def write_changes_to_file(offset,str_,str_len,filename):
+    with open(filename,'wb') as of:
+        of.seek(offset)
+        with mmap.mmap(of.fileno(),length=str_len,access=mmap.ACCESS_WRITE) as mm:
+            mm[:str_len] = str_
+            mm.flush()
+            
