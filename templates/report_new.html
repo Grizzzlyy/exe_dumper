@@ -285,6 +285,12 @@
                         const coloredHexRow = colorElement(rowDict, hex_row.textContent);
 
                         hex_row.innerHTML = coloredHexRow;
+
+                        // Scroll to the element
+                        hex_row.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
                      }
                 });
             });

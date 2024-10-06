@@ -990,3 +990,12 @@
 2024-10-06 19:35:42,565 - INFO - 127.0.0.1 - - [06/Oct/2024 19:35:42] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
 2024-10-06 19:35:42,595 - INFO - 127.0.0.1 - - [06/Oct/2024 19:35:42] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
 2024-10-06 19:36:39,413 - INFO -  * Detected change in 'C:\\Users\\James\\Documents\\_my_docs\\Education\\8_sem\\BIP\\code\\exe_dumper\\trash.py', reloading
+2024-10-06 19:40:01,245 - INFO - 127.0.0.1 - - [06/Oct/2024 19:40:01] "GET /report/2 HTTP/1.1" 200 -
+2024-10-06 19:40:01,432 - INFO - 127.0.0.1 - - [06/Oct/2024 19:40:01] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-06 19:40:01,483 - INFO - 127.0.0.1 - - [06/Oct/2024 19:40:01] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
+2024-10-06 19:41:46,866 - INFO - 127.0.0.1 - - [06/Oct/2024 19:41:46] "GET /report/2 HTTP/1.1" 200 -
+2024-10-06 19:41:46,931 - INFO - 127.0.0.1 - - [06/Oct/2024 19:41:46] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-06 19:41:46,998 - INFO - 127.0.0.1 - - [06/Oct/2024 19:41:46] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
+2024-10-06 19:48:11,108 - INFO - 127.0.0.1 - - [06/Oct/2024 19:48:11] "GET /report/2 HTTP/1.1" 200 -
+2024-10-06 19:48:11,182 - INFO - 127.0.0.1 - - [06/Oct/2024 19:48:11] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2024-10-06 19:48:11,264 - INFO - 127.0.0.1 - - [06/Oct/2024 19:48:11] "GET /hex/2?chunk_idx=0 HTTP/1.1" 200 -
