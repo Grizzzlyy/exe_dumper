@@ -73,7 +73,10 @@
                             <div class="dropdown-content">
                                 <table>
                                     <tr>
-                                        <td><strong>Value</strong></td>
+                                        <td>
+                                            <a href="#{{ value.g_offset }}" class="hex-link" offset="{{ value.offset }}"
+                                               length="{{value.length}}"><strong>Value</strong></a>
+                                        </td>
                                         <td>{{ value.value }}</td>
                                     </tr>
                                 </table>
