@@ -31,12 +31,12 @@ class BD_int():
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s')
 
-    def __insert_file(self, username, file_type, header_first, header_second, import_table, export_table):
+    def __insert_file(self, username, file_type, header_first, header_second, import_table, export_table,file_name):
         self.cursor.execute('''
-            INSERT INTO files (username, filetype, header_first, header_second, import_table, export_table)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO files (username, filetype, header_first, header_second, import_table, export_table, file_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (username, file_type, json.dumps(header_first), json.dumps(header_second), json.dumps(import_table),
-              json.dumps(export_table)))
+              json.dumps(export_table),file_name))
         self.conn.commit()
         generated_id = self.cursor.lastrowid
         logging.info(f"[SUCCESS] File with id:{generated_id} added")
@@ -49,7 +49,8 @@ class BD_int():
                                      header_first=parsed_ms_dos,
                                      header_second=parsed_pe_header,
                                      import_table=parsed_imports,
-                                     export_table=parsed_exports)
+                                     export_table=parsed_exports,
+                                     file_name=os.path.basename(file_path))
         return file_id
 
     def __insert_elf(self, username, file_path):
@@ -59,7 +60,8 @@ class BD_int():
                                      header_first=header,
                                      header_second=segments,
                                      import_table=sections,
-                                     export_table=symbols)
+                                     export_table=symbols,
+                                     file_name=os.path.basename(file_path))
         return file_id
 
     def user_exists(self, username):
