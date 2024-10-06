@@ -209,4 +209,8 @@ summary {
     width: 116px;
 }
 
+.highlight {
+    background-color: yellow; /* Or any color you prefer */
+}
+
 

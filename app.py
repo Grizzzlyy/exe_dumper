@@ -177,6 +177,8 @@ def show_report(file_id):
     report = get_report_info(file_id)
     # offsets, hex_lines, decoded_text = format_hex(report["file_content"])
     # return render_template('report_new.html', report=report, offsets=offsets, hex_lines=hex_lines, decoded_text=decoded_text)
+    # report["header_first"]["e_magic"]["offset"] = 0x22
+    # report["header_first"]["e_magic"]["length"] = 34
     return render_template('report_new.html', report=report, file_id=file_id)
 
 
@@ -191,19 +193,20 @@ def get_hex_chunk(file_id):
         return jsonify({'formatted_hex': None})  # No more chunks to load
 
     # Format the hex and ASCII representation of the chunk
-    offsets, hex_lines, decoded_text = format_hex(chunk)
+    formatted_hex = format_hex(chunk_idx, chunk)
 
-    return jsonify({'offsets': offsets, 'hex_lines': hex_lines, 'decoded_text': decoded_text})
+    return jsonify(formatted_hex)
 
 
-def format_hex(hex_str):
+def format_hex(chunk_idx, hex_str):
     offsets = []
     hex_lines = []
     decoded_text = []
     bytes_per_line = 16
+    chunk_len = int(os.getenv("CHUNK_SIZE"))
 
     for i in range(0, len(hex_str), bytes_per_line * 2):
-        offset = f"{i // 2:08X}"
+        offset = f"{i // 2 + chunk_len * chunk_idx:09X}"
         hex_bytes = [hex_str[j:j + 2] for j in range(i, min(i + bytes_per_line * 2, len(hex_str)), 2)]
         hex_section = ' '.join(hex_bytes)
         ascii_section = ''.join([chr(int(b, 16)) if 32 <= int(b, 16) <= 126 else '.' for b in hex_bytes])
@@ -212,7 +215,12 @@ def format_hex(hex_str):
         hex_lines.append(hex_section)
         decoded_text.append(ascii_section)
 
-    return offsets, hex_lines, decoded_text
+    result = {
+        "offsets": offsets,
+        "hex_lines": hex_lines,
+        "decoded_text": decoded_text
+    }
+    return result
 
 
 # Download binary from report
