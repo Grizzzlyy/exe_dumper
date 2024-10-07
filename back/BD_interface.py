@@ -164,7 +164,7 @@ class BD_int():
             user_info['email'] = report[0]
 
         if report[1] == 1:
-            user_info['is_admin'] = False
+            user_info['is_admin'] = True
         elif report[0] == 0:
             user_info['is_admin'] = False
         if report[2] == 1:
