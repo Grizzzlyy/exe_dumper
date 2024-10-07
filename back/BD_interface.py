@@ -155,12 +155,12 @@ class BD_int():
     def get_user_info(self,username=None,email=None):
         user_info = dict()
         if username == None:
-            report = self.cursor.execute(f'SELECT username, is_admin, is_blocked FROM users WHERE email = ?',(email,)).fetchone()
+            report = self.cursor.execute(f'SELECT username, is_admin, is_blocked, pwd_hash FROM users WHERE email = ?',(email,)).fetchone()
             user_info['username'] = report
             user_info['email'] = email
         elif email == None:
             user_info['username'] = username
-            report = self.cursor.execute(f'SELECT email, is_admin, is_blocked FROM users WHERE username = ?',(username,)).fetchone()
+            report = self.cursor.execute(f'SELECT email, is_admin, is_blocked, pwd_hash FROM users WHERE username = ?',(username,)).fetchone()
             user_info['email'] = report[0]
 
         if report[1] == 1:
@@ -171,8 +171,12 @@ class BD_int():
             user_info['has_access'] = False
         elif report[2] == 0:
             user_info['has_access'] = True
+        user_info['pwd_hash'] = report[3]
 
         return user_info
+    def get_history(self,username):
+        answer = self.cursor.execute(f'SELECT idx,file_name from files WHERE username = ?',(username,)).fetchall()
+        
     def __del__(self):
         self.conn.close()
 
