@@ -102,6 +102,13 @@ class BD_int():
         res = self.cursor.execute("SELECT is_admin FROM users WHERE username = ?", (admin,))
         res = res.fetchone()
         return res == (1,)
+    def get_user_name(self,email):
+        try:
+            username = self.cursor.execute("SELECT username FROM users WHERE email = ?",(email,)).fetchone()[0]
+            return username
+        except Exception as e:
+            logging.info(f"[ERROR] {e}")
+            return None
 
     def ban_user(self, admin, username):
         try:
