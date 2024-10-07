@@ -3,4 +3,4 @@
 __pycache__
 uploads
 test.py
-*log*
+*.log

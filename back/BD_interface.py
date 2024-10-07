@@ -145,5 +145,5 @@ class BD_int():
 
 if __name__ == "__main__":
     bd = BD_int()
-    report = bd.get_report(2)
+    report = bd.add_file("milniy", "./files/HxD.exe")
     pass

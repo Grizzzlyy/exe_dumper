@@ -11,7 +11,7 @@ def get_report_info(file_id):
     bd = BD_int()
     report = bd.get_report(file_id)
 
-    # Format output
+    # Format output in headers
     for k in ["header_first", "header_second"]:
         for elem in report[k]:
             new_elem = report[k][elem]
@@ -33,6 +33,7 @@ def get_report_info(file_id):
                 new_func['g_rva_offset_offset'] = f"{new_func['rva_offset_offset'] & mask :09X}"
 
                 report[k][dll][idx] = new_func
+
     return report
 
 

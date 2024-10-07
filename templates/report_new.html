@@ -101,10 +101,6 @@
                                     <div class="dropdown-content">
                                         <table>
                                             <tr>
-<<<<<<< HEAD
-                                                <td><strong>Address</strong></td>
-                                                <td>{{ function.address }}</td>
-=======
                                                 <td>
                                                     <a href="#{{ function.g_name_offset }}" class="hex-link"
                                                        offset="{{ function.name_offset }}"
@@ -120,7 +116,6 @@
                                                        length="{{function.rva_offset_length}}"><strong>rva_offset</strong></a>
                                                 </td>
                                                 <td>{{ function.rva_offset_offset }}</td>
->>>>>>> 83f24ae (before improving dynamic chunk loading)
                                             </tr>
                                         </table>
                                     </div>
@@ -216,13 +211,6 @@
         const fileId = {{ file_id }};
         initializeHexViewer(fileId);
     });
-<<<<<<< HEAD
-
-
-
-
-=======
->>>>>>> 606d2da (javascript in separate file)
 </script>
 
 {% endblock %}
