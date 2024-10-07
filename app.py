@@ -164,11 +164,15 @@ def logout():
     return redirect(url_for('signin'))
 
 
-# TODO
+def get_history():
+    return [{"file_id": 1, "filename": "HxD.exe"},
+            {"file_id": 2, "filename": "ntdll.dll"}]
+
 @app.route('/history')
 @login_required
 def history():
-    return render_template('upload.html')
+
+    return render_template('history.html')
 
 
 @app.route('/report/<int:file_id>', methods=['GET', 'POST'])
