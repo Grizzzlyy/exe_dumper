@@ -2,6 +2,8 @@
 Format data for frontend
 """
 
+import os
+
 from back.BD_interface import BD_int
 
 
@@ -36,3 +38,28 @@ def get_report_info(file_id):
 
 >>>>>>> 83f24ae (before improving dynamic chunk loading)
     return report
+
+
+def format_hex(chunk_idx, hex_str):
+    offsets = []
+    hex_lines = []
+    decoded_text = []
+    bytes_per_line = 16
+    chunk_len = int(os.getenv("CHUNK_SIZE"))
+
+    for i in range(0, len(hex_str), bytes_per_line * 2):
+        offset = f"{i // 2 + chunk_len * chunk_idx:09X}"
+        hex_bytes = [hex_str[j:j + 2] for j in range(i, min(i + bytes_per_line * 2, len(hex_str)), 2)]
+        hex_section = ' '.join(hex_bytes)
+        ascii_section = ''.join([chr(int(b, 16)) if 32 <= int(b, 16) <= 126 else '.' for b in hex_bytes])
+
+        offsets.append(offset)
+        hex_lines.append(hex_section)
+        decoded_text.append(ascii_section)
+
+    result = {
+        "offsets": offsets,
+        "hex_lines": hex_lines,
+        "decoded_text": decoded_text
+    }
+    return result
