@@ -126,7 +126,7 @@ def check_mail_code():
                     user = {"username": session.get('username'), "email": session.get('email'),
                             "pwd_hash": session.get('pwd_hash'), "has_access": True, "is_admin": False}
                     add_user(user)
-
+                
                 user = user_manage.User(session.get('username'), session.get('email'), has_access=True, is_admin=False)
                 login_user(user)
                 return redirect(url_for('index'))
