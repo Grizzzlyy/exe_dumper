@@ -132,10 +132,43 @@
                 <details class="dropdown">
                     <summary> {{ fields_mapping["export_table"] }}</summary>
                     <div class="dropdown-content">
-                        <p>{{ report["export_table"] | default('No export information available') }}</p>
+                        {% for dll_name, functions in report["export_table"].items() %}
+                        <details>
+                            <summary>{{ dll_name }}</summary>
+                            <div class="dropdown-content">
+                                {% for function in functions %}
+                                <details>
+                                    <summary>{{ function.function }}</summary>
+                                    <div class="dropdown-content">
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <a href="#{{ function.g_name_offset }}" class="hex-link"
+                                                       offset="{{ function.name_offset }}"
+                                                       length="{{function.name_length}}"><strong>name_offset</strong></a>
+                                                </td>
+                                                <td>{{ function.name_offset }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a href="#{{ function.g_rva_offset_offset }}"
+                                                       class="hex-link"
+                                                       offset="{{ function.rva_offset_offset }}"
+                                                       length="{{function.rva_offset_length}}"><strong>rva_offset</strong></a>
+                                                </td>
+                                                <td>{{ function.rva_offset_offset }}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </details>
+                                {% endfor %}
+                            </div>
+                        </details>
+                        {% endfor %}
                     </div>
                 </details>
             </div>
+
         </div>
 
 
