@@ -43,7 +43,7 @@ def parse_pe_header(pe):
     tmp_dict = {}
     for field in pe.FILE_HEADER.__keys__:
         field_value = getattr(pe.FILE_HEADER, field[0])
-        offset = pe.FILE_HEADER.__file_offset__ + pe.FILE_HEADER.get_field_absolute_offset(field[0])
+        offset = pe.FILE_HEADER.get_field_absolute_offset(field[0])
 
         offsets_list.append(offset)        #save offset to list to count field_len
         value = field_value
@@ -89,13 +89,15 @@ def parse_imports(pe):
 
                 # Получаем смещение (offset) в файле на основе виртуального адреса (RVA)
                 function_offset = pe.get_offset_from_rva(function_rva - pe.OPTIONAL_HEADER.ImageBase)
-
+                salam = 0
                 # Сохраняем информацию о функции в словарь
                 imports_data[lib_name].append({
                     'function': func_name,
-                    'address': hex(function_rva),        # Виртуальный адрес
-                    'offset': hex(function_offset),       # Смещение в файле
-                    'length': length
+                    'name_offset': imp.name_offset,
+                    'name_length': len(func_name),
+                    'rva_offset':imp.hint_name_table_rva,
+                    'rva_offset_offset':imp.ordinal_offset,
+                    'rva_offset_length':length
                 })
     
     return imports_data
@@ -118,7 +120,7 @@ def parse_exports(pe):
                 func_name = exp.name.decode('utf-8')
             else:
                 # Если у функции нет имени, используем её порядковый номер (ordinal)
-                func_name = f'Ordinal{exp.ordinal}'
+                continue
 
             # Получаем виртуальный адрес (RVA) функции
             function_rva = exp.address
@@ -129,9 +131,11 @@ def parse_exports(pe):
             # Сохраняем информацию о функции в словарь
             exports_data[lib_name].append({
                 'function': func_name,
-                'address': hex(function_rva),        # Виртуальный адрес
-                'offset': hex(function_offset),       # Смещение в файле
-                'length': length
+                'name_offset': exp.name_offset,
+                'name_length': len(func_name),
+                'rva_offset':exp.address,
+                'rva_offset_offset':exp.address_offset,
+                'rva_offset_length':length
             })
     
     return exports_data

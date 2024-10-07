@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from back import parse_exe
 from back import parse_elf
-from back.parse_file import file_to_hex
+from back.parse_file import get_chunk
 
 load_dotenv()
 
@@ -31,12 +31,12 @@ class BD_int():
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s')
 
-    def __insert_file(self, username, file_type, header_first, header_second, import_table, export_table):
+    def __insert_file(self, username, file_type, header_first, header_second, import_table, export_table,file_name):
         self.cursor.execute('''
-            INSERT INTO files (username, filetype, header_first, header_second, import_table, export_table)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO files (username, filetype, header_first, header_second, import_table, export_table, file_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (username, file_type, json.dumps(header_first), json.dumps(header_second), json.dumps(import_table),
-              json.dumps(export_table)))
+              json.dumps(export_table),file_name))
         self.conn.commit()
         generated_id = self.cursor.lastrowid
         logging.info(f"[SUCCESS] File with id:{generated_id} added")
@@ -49,7 +49,8 @@ class BD_int():
                                      header_first=parsed_ms_dos,
                                      header_second=parsed_pe_header,
                                      import_table=parsed_imports,
-                                     export_table=parsed_exports)
+                                     export_table=parsed_exports,
+                                     file_name=os.path.basename(file_path))
         return file_id
 
     def __insert_elf(self, username, file_path):
@@ -59,7 +60,8 @@ class BD_int():
                                      header_first=header,
                                      header_second=segments,
                                      import_table=sections,
-                                     export_table=symbols)
+                                     export_table=symbols,
+                                     file_name=os.path.basename(file_path))
         return file_id
 
     def user_exists(self, username):
@@ -112,49 +114,36 @@ class BD_int():
             logging.info(f"[SUCCESS] user:{username} is blocked")
         except Exception as e:
             logging.info(f"[ERROR] {e}")
-    def add_2f_code(self,username,code):
-        try: 
-            self.cursor.execute("UPDATE users set two_factor_code = ? WHERE username = ?", (code,username))
+
+    def add_2f_code(self, username, code):
+        try:
+            self.cursor.execute("UPDATE users set two_factor_code = ? WHERE username = ?", (code, username))
             logging.info(f"[SUCCESS] added code: {code} for user:{username}")
         except Exception as e:
             logging.info(f"[ERROR] {e}")
-
 
     # TODO use self.conn etc, like you want
     def get_report(self, file_id):
         self.conn.row_factory = sqlite3.Row  # gets strings as a dict
         self.cursor = self.conn.cursor()
-        subd_answer = self.cursor.execute(f'SELECT * FROM files WHERE idx = {file_id}').fetchone()
-        
+        report = self.cursor.execute(f'SELECT * FROM files WHERE idx = {file_id}').fetchone()
+
         self.conn.close()
-        report = dict()
-        if subd_answer is not None:
-            subd_answer = dict(subd_answer)
-            if subd_answer['filetype'] == 'exe':
-                report['MS_DOS_header'] = subd_answer['header_first']
-                report['PE_header'] = subd_answer['header_second']
-                report['Import_table'] = subd_answer['import_table']
-                report['Export_table'] = subd_answer['export_table']
-            else:
-                json_fields = [ 'header', 'segments', 'sections', 'symbols']
-                report['ELF_header'] = subd_answer['header_first']
-                report['Segments'] = subd_answer['header_second']
-                report['Sections'] = subd_answer['import_table']
-                report['Symbols'] = subd_answer['export_table'] 
 
-            file_name = subd_answer['file_name']
-            file_content = file_to_hex(file_path='files/'+file_name)
-            report["file_content"] = json.loads(file_content)
-        return subd_answer
+        if report is not None:
+            report = dict(report)
+            del report["username"]
+            json_fields = ["header_first", "header_second", "import_table", "export_table"]
+            for k in json_fields:
+                report[k] = json.loads(report[k])
 
-
+        return report
 
     def __del__(self):
         self.conn.close()
 
 
-# Testing
 if __name__ == "__main__":
     bd = BD_int()
-    report = bd.get_report(2)
+    report = bd.add_file("milniy", "./files/HxD.exe")
     pass

@@ -2,16 +2,18 @@ import os
 from functools import wraps
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory
+from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory, jsonify
 from flask_login import LoginManager, UserMixin, login_required, logout_user, current_user, login_user
 
 from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, send_otp_code
-from logic.db_reports import get_report
+# from logic.db_reports import get_report
 from logic.db_users import get_user_info, add_user
 from logic.kartonn import create_report
 from logic import user_manage
 from logic import api
 from back.BD_interface import BD_int
+from back.parse_file import file_to_hex, get_chunk
+from logic.frontend import get_report_info, format_hex
 
 load_dotenv()
 
@@ -172,11 +174,24 @@ def history():
 @app.route('/report/<int:file_id>', methods=['GET', 'POST'])
 @login_required
 def show_report(file_id):
-    bd = BD_int()
-    report = bd.get_report(file_id)
-    return report
-    # report = get_report(current_user.username, report_id)
-    # return render_template('report.html', report=report)
+    report = get_report_info(file_id)
+    return render_template('report_new.html', report=report, file_id=file_id)
+
+
+@app.route('/hex/<int:file_id>', methods=['GET'])
+@login_required
+def get_hex_chunk(file_id):
+    chunk_idx = request.args.get('chunk_idx', 0, type=int)
+
+    chunk = get_chunk(chunk_idx, "./files/HxD.exe")
+
+    if chunk is None:
+        return jsonify({'formatted_hex': None})  # No more chunks to load
+
+    # Format the hex and ASCII representation of the chunk
+    formatted_hex = format_hex(chunk_idx, chunk)
+
+    return jsonify(formatted_hex)
 
 
 # Download binary from report
