@@ -126,8 +126,8 @@ def check_mail_code():
                     user = {"username": session.get('username'), "email": session.get('email'),
                             "pwd_hash": session.get('pwd_hash'), "has_access": True, "is_admin": False}
                     add_user(user)
-                
-                user = user_manage.User(session.get('username'), session.get('email'), has_access=True, is_admin=False)
+                user_info = get_report_info(session.get('username'))
+                user = user_manage.User(user_info["username"],user_info["email"],user_info["hass_access"],user_info["is_admin"])
                 login_user(user)
                 return redirect(url_for('index'))
             else:
@@ -150,6 +150,10 @@ def upload():
             return redirect(url_for('upload'))
 
         report_id = create_report(current_user.username, file)
+        if report_id == -1:
+            flash('Incorrect file type')
+            return redirect(url_for('upload'))
+        
         flash('File successfully uploaded')
         return redirect(url_for('show_report', report_id=report_id))
 
