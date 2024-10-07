@@ -4,8 +4,14 @@ from back.BD_interface import BD_int
 
 def get_user_info(login):
     worker = BD_int()
-    if worker.user_exists(login):
-        return worker.get_user_info()
+    if login_type(login) == 'username':
+        if worker.user_exists(username=login):
+            return worker.get_user_info()
+        return None
+    elif login_type(login) == 'email':
+        if worker.user_exists(email=login):
+            return worker.get_user_info()
+        return None
     else:
         # ERROR
         raise ValueError(f"login type is {login_type(login)}")
