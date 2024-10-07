@@ -1,5 +1,6 @@
 from werkzeug.security import generate_password_hash
 from logic.utils import login_type
+from back.BD_interface import BD_int
 
 tmp_db = [
     {"username": "alice", "email": "alice@mail.com", "pwd_hash": generate_password_hash('alice'),
@@ -14,10 +15,10 @@ tmp_db = [
 
 
 def get_user_info(login):
+    worker = BD_int()
     if login_type(login) == "username":
-        for usr in tmp_db:
-            if usr["username"] == login:
-                return usr
+        if worker.user_exists():
+            return worker.get_user_info()
         return None
     elif login_type(login) == "email":
         for usr in tmp_db:
@@ -30,9 +31,11 @@ def get_user_info(login):
 
 
 def add_user(user):
-    tmp_db.append(user)
+    worker = BD_int()
+    worker.add_user(user["username"],user["email"],user["pwd_hash"])
 
 
 def get_user_email(login):
-    user_info = get_user_info(login)
-    return user_info["email"]
+    worker = BD_int()
+    email = worker.get_email(login)
+    return email

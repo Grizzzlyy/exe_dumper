@@ -109,6 +109,13 @@ class BD_int():
         except Exception as e:
             logging.info(f"[ERROR] {e}")
             return None
+    def get_email(self,username):
+        try:
+            email = self.cursor.execute("SELECT email FROM users WHERE username = ?",(username,)).fetchone()[0]
+            return email
+        except Exception as e:
+            logging.info(f"[ERROR] {e}")
+            return None
 
     def ban_user(self, admin, username):
         try:
@@ -145,7 +152,19 @@ class BD_int():
                 report[k] = json.loads(report[k])
 
         return report
-
+    def get_user_info(self,username=None,email=None):
+        user_info = dict()
+        if username == None:
+            report = self.cursor.execute(f'SELECT username, pwd_hash, two_factor_code FROM users WHERE email = ?',(email,)).fetchone()
+            user_info['username'] = report
+            user_info['email'] = email
+        elif email == None:
+            user_info['username'] = username
+            report = self.cursor.execute(f'SELECT email, pwd_hash, two_factor_code FROM users WHERE username = ?',(username,)).fetchone()
+            user_info['email'] = report[0]
+        user_info['pwd_hash'] = report[1]
+        user_info['2f_code'] = report[2]
+        return user_info
     def __del__(self):
         self.conn.close()
 
