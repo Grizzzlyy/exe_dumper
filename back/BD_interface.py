@@ -155,15 +155,23 @@ class BD_int():
     def get_user_info(self,username=None,email=None):
         user_info = dict()
         if username == None:
-            report = self.cursor.execute(f'SELECT username, pwd_hash, two_factor_code FROM users WHERE email = ?',(email,)).fetchone()
+            report = self.cursor.execute(f'SELECT username, is_admin, is_blocked FROM users WHERE email = ?',(email,)).fetchone()
             user_info['username'] = report
             user_info['email'] = email
         elif email == None:
             user_info['username'] = username
-            report = self.cursor.execute(f'SELECT email, pwd_hash, two_factor_code FROM users WHERE username = ?',(username,)).fetchone()
+            report = self.cursor.execute(f'SELECT email, is_admin, is_blocked FROM users WHERE username = ?',(username,)).fetchone()
             user_info['email'] = report[0]
-        user_info['pwd_hash'] = report[1]
-        user_info['2f_code'] = report[2]
+
+        if report[1] == 1:
+            user_info['is_admin'] = False
+        elif report[0] == 0:
+            user_info['is_admin'] = False
+        if report[2] == 1:
+            user_info['has_access'] = False
+        elif report[2] == 0:
+            user_info['has_access'] = True
+
         return user_info
     def __del__(self):
         self.conn.close()

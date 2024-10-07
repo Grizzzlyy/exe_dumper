@@ -150,6 +150,10 @@ def upload():
             return redirect(url_for('upload'))
 
         report_id = create_report(current_user.username, file)
+        if report_id == -1:
+            flash('Incorrect file type')
+            return redirect(url_for('upload'))
+        
         flash('File successfully uploaded')
         return redirect(url_for('show_report', report_id=report_id))
 
