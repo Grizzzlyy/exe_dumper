@@ -1,0 +1,25 @@
+{% extends "base_nav.html" %}
+
+{% block title %}History{% endblock %}
+
+{% block content %}
+<div id="history-container">
+    <h2>History</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Filename</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for history_item in history %}
+        <tr>
+            <td>{{ history_item.file_id }}</td>
+            <td><a href="{{ url_for('show_report', file_id=history_item.file_id) }}">{{ history_item.filename }}</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

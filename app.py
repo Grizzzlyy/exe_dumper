@@ -127,7 +127,8 @@ def check_mail_code():
                             "pwd_hash": session.get('pwd_hash'), "has_access": True, "is_admin": False}
                     add_user(user)
                 user_info = get_report_info(session.get('username'))
-                user = user_manage.User(user_info["username"],user_info["email"],user_info["hass_access"],user_info["is_admin"])
+                user = user_manage.User(user_info["username"], user_info["email"], user_info["hass_access"],
+                                        user_info["is_admin"])
                 login_user(user)
                 return redirect(url_for('index'))
             else:
@@ -153,7 +154,7 @@ def upload():
         if report_id == -1:
             flash('Incorrect file type')
             return redirect(url_for('upload'))
-        
+
         flash('File successfully uploaded')
         return redirect(url_for('show_report', report_id=report_id))
 
@@ -168,11 +169,14 @@ def logout():
     return redirect(url_for('signin'))
 
 
-# TODO
 @app.route('/history')
 @login_required
 def history():
-    return render_template('upload.html')
+    history_dict = [
+        {"file_id": 1, "filename": "HxD.exe"},
+        {"file_id": 2, "filename": "ntdll.dll"}
+    ]
+    return render_template('history.html', history=history_dict)
 
 
 @app.route('/report/<int:file_id>', methods=['GET', 'POST'])
@@ -206,12 +210,36 @@ def get_binary(username, filename):
     return send_from_directory(dir, filename)
 
 
-# TODO
+users = [
+    {"username": "user1", "has_access": True},
+    {"username": "user2", "has_access": False},
+    {"username": "user3", "has_access": True},
+]
+
+
 @app.route('/admin_panel')
 @login_required
 @admin_required
 def admin_panel():
-    pass
+    return render_template('admin_panel.html', users=users)
+
+
+@app.route('/block/<string:username>', methods=['POST'])
+def block_user(username):
+    for user in users:
+        if user['username'] == username:
+            user['has_access'] = False
+            break
+    return redirect(url_for('admin_panel'))
+
+
+@app.route('/unblock/<string:username>', methods=['POST'])
+def unblock_user(username):
+    for user in users:
+        if user['username'] == username:
+            user['has_access'] = True
+            break
+    return redirect(url_for('admin_panel'))
 
 
 if __name__ == '__main__':
