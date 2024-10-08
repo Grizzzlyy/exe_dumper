@@ -7,7 +7,7 @@ from flask_login import LoginManager, UserMixin, login_required, logout_user, cu
 
 from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, send_otp_code
 # from logic.db_reports import get_report
-from logic.db_users import get_user_info, add_user
+from logic.db_users import get_user_info, add_user, change_user_access, get_list_of_users
 from logic.kartonn import create_report
 from logic import user_manage
 from logic import api
@@ -126,8 +126,8 @@ def check_mail_code():
                     user = {"username": session.get('username'), "email": session.get('email'),
                             "pwd_hash": session.get('pwd_hash'), "has_access": True, "is_admin": False}
                     add_user(user)
-                user_info = get_report_info(session.get('username'))
-                user = user_manage.User(user_info["username"], user_info["email"], user_info["hass_access"],
+                user_info = get_user_info(session.get('username'))
+                user = user_manage.User(user_info["username"], user_info["email"], user_info["has_access"],
                                         user_info["is_admin"])
                 login_user(user)
                 return redirect(url_for('index'))
@@ -210,35 +210,24 @@ def get_binary(username, filename):
     return send_from_directory(dir, filename)
 
 
-users = [
-    {"username": "user1", "has_access": True},
-    {"username": "user2", "has_access": False},
-    {"username": "user3", "has_access": True},
-]
-
 
 @app.route('/admin_panel')
 @login_required
 @admin_required
 def admin_panel():
+    users = get_list_of_users()
     return render_template('admin_panel.html', users=users)
 
 
 @app.route('/block/<string:username>', methods=['POST'])
 def block_user(username):
-    for user in users:
-        if user['username'] == username:
-            user['has_access'] = False
-            break
+    change_user_access(username, ban=True)
     return redirect(url_for('admin_panel'))
 
 
 @app.route('/unblock/<string:username>', methods=['POST'])
 def unblock_user(username):
-    for user in users:
-        if user['username'] == username:
-            user['has_access'] = True
-            break
+    change_user_access(username, ban = False)
     return redirect(url_for('admin_panel'))
 
 

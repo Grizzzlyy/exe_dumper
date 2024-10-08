@@ -1,7 +1,7 @@
 from werkzeug.security import generate_password_hash
 from logic.utils import login_type
 from back.BD_interface import BD_int
-
+from flask import jsonify
 def get_user_info(login):
     worker = BD_int()
     if login_type(login) == 'username':
@@ -18,11 +18,19 @@ def get_user_info(login):
 
 
 def add_user(user):
-    worker = BD_int()
-    worker.add_user(user["username"],user["email"],user["pwd_hash"])
+    with BD_int() as worker:
+        worker.add_user(user["username"],user["email"],user["pwd_hash"])
 
 
 def get_user_email(login):
-    worker = BD_int()
-    email = worker.get_email(login)
+    with BD_int() as worker:
+        email = worker.get_email(login)
     return email
+
+def change_user_access(username, ban):
+    with BD_int() as worker:
+        worker.change_user_access(username, ban)
+        
+def getlist_of_users():
+    with BD_int() as worker:
+        return jsonify(worker.get_list_of_users()) 

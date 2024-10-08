@@ -33,7 +33,7 @@ class BD_int():
     def __enter__(self):
         return self
     def __exit__(self, exc_type, exc_value, traceback):
-        pass
+        self.conn.close()
 
     def __insert_file(self, username, file_type, header_first, header_second, import_table, export_table,file_name):
         self.cursor.execute('''
@@ -121,13 +121,10 @@ class BD_int():
             logging.info(f"[ERROR] {e}")
             return None
 
-    def ban_user(self, admin, username):
+    def change_user_access(self, username, ban):
         try:
-            if not self.check_admin(admin):
-                raise ValueError(f"Not an admin:{admin} try to ban user:{username}")
-            if self.check_admin(username):
-                raise ValueError(f"Try to ban admin:{username}")
-            self.cursor.execute("UPDATE users set is_blocked = 1 WHERE username = ?", (username,))
+            status = 1 if ban == True else 0
+            self.cursor.execute("UPDATE users set is_blocked = {status} WHERE username = ?", (username,))
             self.conn.commit()
             logging.info(f"[SUCCESS] user:{username} is blocked")
         except Exception as e:
@@ -181,6 +178,21 @@ class BD_int():
         except Exception as e:
             logging.info(f"[ERROR]: e")
             return e
+    def get_list_of_users(self):
+        query = "SELECT username, is_admin, is_blocked, email FROM users"
+        users = self.cursor.execute(query).fetchall()
+
+        # Преобразование результата в список словарей
+        result = [
+            {
+                "username": user[0],
+                "has_access": not user[2],  # Обратное значение is_blocked
+                "email": user[3]
+            }
+            for user in users
+        ]
+        return result
+
     
     def get_history(self,username):
         answer = self.cursor.execute(f'SELECT idx, file_name from files WHERE username = ?',(username,)).fetchall()
