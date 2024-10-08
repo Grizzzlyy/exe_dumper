@@ -30,6 +30,10 @@ class BD_int():
             filename='BD/file_processing.log',
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s')
+    def __enter__(self):
+        return self
+    def __exit__(self, exc_type, exc_value, traceback):
+        pass
 
     def __insert_file(self, username, file_type, header_first, header_second, import_table, export_table,file_name):
         self.cursor.execute('''
@@ -152,32 +156,39 @@ class BD_int():
                 report[k] = json.loads(report[k])
 
         return report
-    def get_user_info(self,username=None,email=None):
-        user_info = dict()
-        if username == None:
-            report = self.cursor.execute(f'SELECT username, is_admin, is_blocked, pwd_hash FROM users WHERE email = ?',(email,)).fetchone()
-            user_info['username'] = report
-            user_info['email'] = email
-        elif email == None:
-            user_info['username'] = username
-            report = self.cursor.execute(f'SELECT email, is_admin, is_blocked, pwd_hash FROM users WHERE username = ?',(username,)).fetchone()
-            user_info['email'] = report[0]
+    def get_user_info(self, username=None, email=None):
+        try:
+            if not username and not email:
+                raise ValueError("Either 'username' or 'email' must be provided")
 
-        if report[1] == 1:
-            user_info['is_admin'] = True
-        elif report[0] == 0:
-            user_info['is_admin'] = False
-        if report[2] == 1:
-            user_info['has_access'] = False
-        elif report[2] == 0:
-            user_info['has_access'] = True
-        user_info['pwd_hash'] = report[3]
+            condition = "email = ?" if email else "username = ?"
+            param = email if email else username
 
-        return user_info
+            report = self.cursor.execute(f'SELECT username, email, is_admin, is_blocked, pwd_hash FROM users WHERE {condition}', (param,)).fetchone()
+
+            if report is None:
+                return None  # Можно также выбросить исключение или вернуть ошибку
+
+            user_info = {
+                'username': report[0],
+                'email': report[1],
+                'is_admin': bool(report[2]),
+                'has_access': not bool(report[3]),
+                'pwd_hash': report[4]
+            }
+
+            return user_info
+        except Exception as e:
+            logging.info(f"[ERROR]: e")
+            return e
+    
     def get_history(self,username):
-        answer = self.cursor.execute(f'SELECT idx,file_name from files WHERE username = ?',(username,)).fetchall()
+        answer = self.cursor.execute(f'SELECT idx, file_name from files WHERE username = ?',(username,)).fetchall()
+        report = [{"file_id": row[0], "filename": row[1]} for row in answer]
+        return report
         
     def __del__(self):
+        print("deleted")
         self.conn.close()
 
 
