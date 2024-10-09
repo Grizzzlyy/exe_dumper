@@ -110,7 +110,7 @@ class CunkFile(Resource):
         },
         'parameters': [
             {
-
+                ''
             },
             {
                 'name': 'file_name',

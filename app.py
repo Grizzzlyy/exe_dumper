@@ -206,6 +206,7 @@ def get_binary(username, filename):
     dir = os.path.join(UPLOADS_DIR, current_user.username)
     return send_from_directory(dir, filename)
 
+
 @app.route('/admin_panel')
 @login_required
 @admin_required

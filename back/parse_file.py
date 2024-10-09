@@ -29,7 +29,6 @@ def file_to_hex(file_content):
         logging.info(f"[ERROR] {e}")
 
 def get_chunk(chunk_number,filename):
-
     CHUNK_SIZE = int(os.getenv("CHUNK_SIZE"))
     chunk_size = CHUNK_SIZE
     f_size = os.path.getsize(filename)

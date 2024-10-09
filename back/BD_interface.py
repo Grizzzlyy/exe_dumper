@@ -203,7 +203,7 @@ class BD_int():
         return report
         
     def __del__(self):
-        print("deleted")
+        # print("deleted")
         self.conn.close()
 
 
