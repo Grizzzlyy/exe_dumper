@@ -2,6 +2,8 @@ from werkzeug.security import generate_password_hash
 from logic.utils import login_type
 from back.BD_interface import BD_int
 from flask import jsonify
+from flask_jwt_extended import create_access_token
+
 def get_user_info(login):
     with BD_int() as worker:
         if login_type(login) == 'username':
@@ -38,3 +40,11 @@ def get_list_of_users():
 def get_history(username):
     with BD_int() as worker:
         return worker.get_history(username)
+    
+def get_filename(file_idx):
+    with BD_int() as worker:
+        return worker.get_filename_by_idx(file_idx)
+
+def create_token(username):
+    access_token = create_access_token(identity=username)
+    return access_token

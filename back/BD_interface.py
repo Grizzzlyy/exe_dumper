@@ -192,7 +192,10 @@ class BD_int():
             for user in users
         ]
         return result
-
+    def get_filename_by_idx(self,file_idx):
+        answer = self.cursor.execute(f"SELECT filename from files WHERE idx = ?",(file_idx)).fetchone()[0]
+        return answer
+        
     
     def get_history(self,username):
         answer = self.cursor.execute(f'SELECT idx, file_name from files WHERE username = ?',(username,)).fetchall()
