@@ -4,7 +4,7 @@ import sqlite3
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
 from flasgger import Swagger, swag_from
-from flask_login import login_required
+# from flask_login import login_required
 
 from back.BD_interface import BD_int
 
@@ -34,7 +34,6 @@ class Report(Resource):
             }
         ]
     })
-    @login_required
     def get(self, file_id):
         with BD_int() as bd:
             report = bd.get_report(file_id)
@@ -45,7 +44,7 @@ class Report(Resource):
             return jsonify(report) 
 
 
-class ReportFile(Resource):
+class HistoryClass(Resource):
     @swag_from({
         'responses': {
             200: {
@@ -73,7 +72,6 @@ class ReportFile(Resource):
             }
         ]
     })
-    @login_required
     def get(self, username):
         with BD_int() as bd:
             history = bd.get_history(username)
@@ -88,5 +86,5 @@ def init(app):
     api = Api(app)
     swagger = Swagger(app)
     api.add_resource(Report, '/api/report/<string:file_id>') 
-    api.add_resource(ReportFile, '/api/report_history/<string:username>')
+    api.add_resource(HistoryClass, '/api/report_history/<string:username>')
 

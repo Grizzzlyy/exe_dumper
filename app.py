@@ -7,7 +7,7 @@ from flask_login import LoginManager, UserMixin, login_required, logout_user, cu
 
 from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, send_otp_code
 # from logic.db_reports import get_report
-from logic.db_users import get_user_info, add_user, change_user_access, get_list_of_users
+from logic.db_users import get_user_info, add_user, change_user_access, get_list_of_users,get_history
 from logic.kartonn import create_report
 from logic import user_manage
 from logic import api
@@ -172,10 +172,7 @@ def logout():
 @app.route('/history')
 @login_required
 def history():
-    history_dict = [
-        {"file_id": 1, "filename": "HxD.exe"},
-        {"file_id": 2, "filename": "ntdll.dll"}
-    ]
+    history_dict = get_history(current_user.username)
     return render_template('history.html', history=history_dict)
 
 
@@ -209,8 +206,6 @@ def get_binary(username, filename):
     dir = os.path.join(UPLOADS_DIR, current_user.username)
     return send_from_directory(dir, filename)
 
-
-
 @app.route('/admin_panel')
 @login_required
 @admin_required
@@ -227,7 +222,7 @@ def block_user(username):
 
 @app.route('/unblock/<string:username>', methods=['POST'])
 def unblock_user(username):
-    change_user_access(username, ban = False)
+    change_user_access(username, ban=False)
     return redirect(url_for('admin_panel'))
 
 

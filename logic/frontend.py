@@ -8,8 +8,8 @@ from back.BD_interface import BD_int
 
 
 def get_report_info(file_id):
-    bd = BD_int()
-    report = bd.get_report(file_id)
+    with BD_int() as bd:
+        report = bd.get_report(file_id)
 
     # Format output in headers
     for k in ["header_first", "header_second"]:

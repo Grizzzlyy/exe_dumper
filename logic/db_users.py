@@ -3,18 +3,18 @@ from logic.utils import login_type
 from back.BD_interface import BD_int
 from flask import jsonify
 def get_user_info(login):
-    worker = BD_int()
-    if login_type(login) == 'username':
-        if worker.user_exists(login):
-            return worker.get_user_info(username=login)
-        return None
-    elif login_type(login) == 'email':
-        if worker.get_user_name('email') != None:
-            return worker.get_user_info(email=login)
-        return None
-    else:
-        # ERROR
-        raise ValueError(f"login type is {login_type(login)}")
+    with BD_int() as worker:
+        if login_type(login) == 'username':
+            if worker.user_exists(login):
+                return worker.get_user_info(username=login)
+            return None
+        elif login_type(login) == 'email':
+            if worker.get_user_name('email') != None:
+                return worker.get_user_info(email=login)
+            return None
+        else:
+            # ERROR
+            raise ValueError(f"login type is {login_type(login)}")
 
 
 def add_user(user):
@@ -31,6 +31,10 @@ def change_user_access(username, ban):
     with BD_int() as worker:
         worker.change_user_access(username, ban)
         
-def getlist_of_users():
+def get_list_of_users():
     with BD_int() as worker:
-        return jsonify(worker.get_list_of_users()) 
+        return worker.get_list_of_users()
+    
+def get_history(username):
+    with BD_int() as worker:
+        return worker.get_history(username)
