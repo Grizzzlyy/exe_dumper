@@ -30,17 +30,19 @@ class BD_int():
             filename='BD/file_processing.log',
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s')
+
     def __enter__(self):
         return self
+
     def __exit__(self, exc_type, exc_value, traceback):
         self.conn.close()
 
-    def __insert_file(self, username, file_type, header_first, header_second, import_table, export_table,file_name):
+    def __insert_file(self, username, file_type, header_first, header_second, import_table, export_table, file_name):
         self.cursor.execute('''
             INSERT INTO files (username, filetype, header_first, header_second, import_table, export_table, file_name)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (username, file_type, json.dumps(header_first), json.dumps(header_second), json.dumps(import_table),
-              json.dumps(export_table),file_name))
+              json.dumps(export_table), file_name))
         self.conn.commit()
         generated_id = self.cursor.lastrowid
         logging.info(f"[SUCCESS] File with id:{generated_id} added")
@@ -106,16 +108,18 @@ class BD_int():
         res = self.cursor.execute("SELECT is_admin FROM users WHERE username = ?", (admin,))
         res = res.fetchone()
         return res == (1,)
-    def get_user_name(self,email):
+
+    def get_user_name(self, email):
         try:
-            username = self.cursor.execute("SELECT username FROM users WHERE email = ?",(email,)).fetchone()[0]
+            username = self.cursor.execute("SELECT username FROM users WHERE email = ?", (email,)).fetchone()[0]
             return username
         except Exception as e:
             logging.info(f"[ERROR] {e}")
             return None
-    def get_email(self,username):
+
+    def get_email(self, username):
         try:
-            email = self.cursor.execute("SELECT email FROM users WHERE username = ?",(username,)).fetchone()[0]
+            email = self.cursor.execute("SELECT email FROM users WHERE username = ?", (username,)).fetchone()[0]
             return email
         except Exception as e:
             logging.info(f"[ERROR] {e}")
@@ -156,6 +160,7 @@ class BD_int():
                 report[k] = json.loads(report[k])
 
         return report
+
     def get_user_info(self, username=None, email=None):
         try:
             if not username and not email:
@@ -164,7 +169,9 @@ class BD_int():
             condition = "email = ?" if email else "username = ?"
             param = email if email else username
 
-            report = self.cursor.execute(f'SELECT username, email, is_admin, is_blocked, pwd_hash FROM users WHERE {condition}', (param,)).fetchone()
+            report = self.cursor.execute(
+                f'SELECT username, email, is_admin, is_blocked, pwd_hash FROM users WHERE {condition}',
+                (param,)).fetchone()
 
             if report is None:
                 return None  # Можно также выбросить исключение или вернуть ошибку
@@ -181,6 +188,7 @@ class BD_int():
         except Exception as e:
             logging.info(f"[ERROR]: e")
             return e
+
     def get_list_of_users(self):
         query = "SELECT username, is_admin, is_blocked, email FROM users"
         users = self.cursor.execute(query).fetchall()
@@ -195,16 +203,16 @@ class BD_int():
             for user in users
         ]
         return result
-    def get_filename_by_idx(self,file_idx):
-        answer = self.cursor.execute(f"SELECT filename from files WHERE idx = ?",(file_idx)).fetchone()[0]
+
+    def get_filename_by_idx(self, file_idx):
+        answer = self.cursor.execute(f"SELECT filename from files WHERE idx = ?", (file_idx)).fetchone()[0]
         return answer
-        
-    
-    def get_history(self,username):
-        answer = self.cursor.execute(f'SELECT idx, file_name from files WHERE username = ?',(username,)).fetchall()
+
+    def get_history(self, username):
+        answer = self.cursor.execute(f'SELECT idx, file_name from files WHERE username = ?', (username,)).fetchall()
         report = [{"file_id": row[0], "filename": row[1]} for row in answer]
         return report
-        
+
     def __del__(self):
         # print("deleted")
         self.conn.close()

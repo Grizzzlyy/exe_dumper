@@ -6,13 +6,11 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from flask_login import LoginManager, UserMixin, login_required, logout_user, current_user, login_user
 
 from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, send_otp_code
-# from logic.db_reports import get_report
-from logic.db_users import get_user_info, add_user, change_user_access, get_list_of_users,get_history
-from logic.kartonn import create_report
+from logic.db_users import get_user_info, add_user, change_user_access, get_list_of_users, get_history
+from logic.report import create_report
 from logic import user_manage
 from logic import api
-from back.BD_interface import BD_int
-from back.parse_file import file_to_hex, get_chunk
+from back.parse_file import get_chunk
 from logic.frontend import get_report_info, format_hex
 
 load_dotenv()
@@ -26,7 +24,7 @@ api.init(app)
 UPLOADS_DIR = os.getenv("UPLOADS_DIR")
 
 
-# Decorator, if first step of 2FA is completed
+# Decorator, if first step of 2FA is completed but second isn't
 def pwd_correct(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -41,6 +39,7 @@ def pwd_correct(f):
 
 def admin_required(f):
     @wraps(f)
+    @login_required
     def decorated_function(*args, **kwargs):
         # Check if the user has completed 2FA
         if not current_user.is_admin:
@@ -50,9 +49,21 @@ def admin_required(f):
     return decorated_function
 
 
+# Check if user is logged in and has access
+def access_required(f):
+    @wraps(f)
+    @login_required
+    def decorated_function(*args, **kwargs):
+        # Check if the user has completed 2FA
+        if not current_user.has_access:
+            return redirect(request.referrer or url_for('upload'))
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 @app.route('/')
 def index():
-    print(current_user.is_authenticated)  # Debugging purpose
     if current_user.is_authenticated:
         return redirect(url_for('upload'))
     return redirect(url_for('signin'))
@@ -129,7 +140,7 @@ def check_mail_code():
                 user_info = get_user_info(session.get('username'))
                 user = user_manage.User(user_info["username"], user_info["email"], user_info["has_access"],
                                         user_info["is_admin"])
-                login_user(user)
+                login_user(user)  # Login user
                 return redirect(url_for('index'))
             else:
                 flash('Invalid code. Please try again.')
@@ -138,7 +149,7 @@ def check_mail_code():
 
 
 @app.route('/upload', methods=['GET', 'POST'])
-@login_required
+@access_required
 def upload():
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -150,19 +161,19 @@ def upload():
             flash('No selected file')
             return redirect(url_for('upload'))
 
-        report_id = create_report(current_user.username, file)
-        if report_id == -1:
+        file_id = create_report(current_user.username, file)
+        if file_id == -1:
             flash('Incorrect file type')
             return redirect(url_for('upload'))
 
         flash('File successfully uploaded')
-        return redirect(url_for('show_report', report_id=report_id))
+        return redirect(url_for('show_report', file_id=file_id))
 
     return render_template('upload.html')
 
 
 @app.route('/logout')
-@login_required
+@access_required
 def logout():
     logout_user()
     flash('You have been logged out.')
@@ -170,21 +181,21 @@ def logout():
 
 
 @app.route('/history')
-@login_required
+@access_required
 def history():
     history_dict = get_history(current_user.username)
     return render_template('history.html', history=history_dict)
 
 
 @app.route('/report/<int:file_id>', methods=['GET', 'POST'])
-@login_required
+@access_required
 def show_report(file_id):
     report = get_report_info(file_id)
-    return render_template('report_new.html', report=report, file_id=file_id)
+    return render_template('report.html', report=report, file_id=file_id)
 
 
 @app.route('/hex/<int:file_id>', methods=['GET'])
-@login_required
+@access_required
 def get_hex_chunk(file_id):
     chunk_idx = request.args.get('chunk_idx', 0, type=int)
 
@@ -201,14 +212,13 @@ def get_hex_chunk(file_id):
 
 # Download binary from report
 @app.route('/uploads/<string:username>/<string:filename>')
-@login_required
+@access_required
 def get_binary(username, filename):
     dir = os.path.join(UPLOADS_DIR, current_user.username)
     return send_from_directory(dir, filename)
 
 
 @app.route('/admin_panel')
-@login_required
 @admin_required
 def admin_panel():
     users = get_list_of_users()
@@ -216,14 +226,18 @@ def admin_panel():
 
 
 @app.route('/block/<string:username>', methods=['POST'])
+@admin_required
 def block_user(username):
     change_user_access(username, ban=True)
+    flash(f"User '{username}' has been blocked.", 'success')
     return redirect(url_for('admin_panel'))
 
 
 @app.route('/unblock/<string:username>', methods=['POST'])
+@admin_required
 def unblock_user(username):
     change_user_access(username, ban=False)
+    flash(f"User '{username}' has been unblocked.", 'success')
     return redirect(url_for('admin_panel'))
 
 

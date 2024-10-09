@@ -12,7 +12,7 @@ def create_report(username, file):
     os.makedirs(dir, exist_ok=True)
     file.save(os.path.join(dir, filename))
     worker = BD_int()
-    file_id = worker.add_file(username,os.path.join(dir, filename))
+    file_id = worker.add_file(username, os.path.join(dir, filename))
     if file_id == -1:
-        os.remove(os.path.join(dir,filename))
+        os.remove(os.path.join(dir, filename))
     return file_id

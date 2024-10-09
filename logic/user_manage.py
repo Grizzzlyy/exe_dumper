@@ -1,12 +1,18 @@
+"""
+Flask-login logic
+"""
+
 from flask_login import UserMixin, LoginManager
 from logic.db_users import get_user_info
 
 login_manager = LoginManager()
 
+
 def init(app, login_view):
     # Initialize Flask-Login
     login_manager.init_app(app)
     login_manager.login_view = 'signup'  # Redirect to login page if not logged in
+
 
 # current_user from flask-login
 class User(UserMixin):

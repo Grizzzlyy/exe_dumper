@@ -14,7 +14,6 @@ from flask_jwt_extended import JWTManager
 from back.BD_interface import BD_int
 
 
-
 class Report(Resource):
     @swag_from({
         'responses': {
@@ -36,7 +35,7 @@ class Report(Resource):
                 'name': 'file_id',
                 'description': 'ID of the file to get report fields',
                 'in': 'path',
-                'type': 'string',  
+                'type': 'string',
                 'required': True
             }
         ]
@@ -49,7 +48,7 @@ class Report(Resource):
         if not report:
             return {'message': 'Report not found'}, 404
         else:
-            return jsonify(report) 
+            return jsonify(report)
 
 
 class HistoryClass(Resource):
@@ -91,7 +90,8 @@ class HistoryClass(Resource):
         if not history:
             return {'message': 'History not found'}, 404
         else:
-            return jsonify(history)  
+            return jsonify(history)
+
 
 class CunkFile(Resource):
     @swag_from({
@@ -116,7 +116,7 @@ class CunkFile(Resource):
                 'name': 'file_name',
                 'description': 'name of file to get chunk from it',
                 'in': 'path',
-                'type': 'string',  
+                'type': 'string',
                 'required': True
             }
         ]
@@ -124,10 +124,11 @@ class CunkFile(Resource):
     def get():
         pass
 
+
 def init(app):
     api = Api(app)
     swagger = Swagger(app)
-    api.add_resource(Report, '/api/report/<string:file_id>') 
+    api.add_resource(Report, '/api/report/<string:file_id>')
     api.add_resource(HistoryClass, '/api/report_history/<string:username>')
     app.config["JWT_SECRET_KEY"] = getenv("JWT_SECRET_KEY")
     jwt = JWTManager(app)
