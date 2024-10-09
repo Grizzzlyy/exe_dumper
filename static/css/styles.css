@@ -9,9 +9,7 @@ body {
 }
 
 h1 {
-
-text-align: center;
-
+    text-align: center;
 }
 
 h2 {
@@ -57,7 +55,7 @@ nav ul .right {
 }
 
 /* Form Styles */
-form {
+.signin-container form {
     display: block;
     margin: 20px auto; /* Centering the form */
     max-width: 400px; /* Limit the width of the form */
@@ -69,13 +67,13 @@ form {
 }
 
 
-form label {
+.signin-container form label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
 }
 
-form input {
+.signin-container form input {
     box-sizing: border-box;
     width: 100%; /* Full width */
     padding: 10px;
@@ -84,7 +82,7 @@ form input {
     border-radius: 5px;
 }
 
-form button {
+.signin-container form button {
     width: 100%; /* Full width button */
     padding: 10px; /* Add padding for comfort */
     background-color: #333; /* Button background */
@@ -94,7 +92,7 @@ form button {
     cursor: pointer; /* Pointer on hover */
 }
 
-form button:hover {
+.signin-container form button:hover {
     background-color: #575757; /* Darker on hover */
 }
 
@@ -261,5 +259,80 @@ summary {
 #history-container table a:hover {
     text-decoration: underline;
 }
+
+
+#admin-panel-container {
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 800px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#admin-panel-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    color: #333;
+}
+
+#admin-panel-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+#admin-panel-container th, #admin-panel-container td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+#admin-panel-container th {
+    background-color: #f1f1f1;
+    font-weight: bold;
+    color: #555;
+}
+
+/* Form styling */
+.action-form {
+    display: inline-block;
+    margin: 0; /* Remove any default margin */
+}
+
+/* Button styling */
+.action-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto; /* Center the button */
+}
+
+/* Block button (blue) */
+.block-btn {
+    background-color: #007bff;
+}
+
+.block-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Unblock button (green) */
+.unblock-btn {
+    background-color: #28a745;
+}
+
+.unblock-btn:hover {
+    background-color: #218838;
+}
+
+#admin-panel-container td {
+    vertical-align: middle;
+}
+
 
 

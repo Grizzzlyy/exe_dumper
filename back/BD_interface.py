@@ -124,9 +124,12 @@ class BD_int():
     def change_user_access(self, username, ban):
         try:
             status = 1 if ban == True else 0
-            self.cursor.execute("UPDATE users set is_blocked = {status} WHERE username = ?", (username,))
+            self.cursor.execute(f"UPDATE users set is_blocked = {status} WHERE username = ?", (username,))
             self.conn.commit()
-            logging.info(f"[SUCCESS] user:{username} is blocked")
+            if status == 1:
+                logging.info(f"[SUCCESS] user:{username} is blocked")
+            else:
+                logging.info(f"[SUCCESS] user:{username} is unblocked")
         except Exception as e:
             logging.info(f"[ERROR] {e}")
 

@@ -5,6 +5,9 @@
 {% block content %}
 <div id="history-container">
     <h2>History</h2>
+    {% if history|length == 0 %}
+    <p>No history yet</p>
+    {% else %}
     <table>
         <thead>
         <tr>
@@ -16,10 +19,13 @@
         {% for history_item in history %}
         <tr>
             <td>{{ history_item.file_id }}</td>
-            <td><a href="{{ url_for('show_report', file_id=history_item.file_id) }}">{{ history_item.filename }}</a></td>
+            <td><a href="{{ url_for('show_report', file_id=history_item.file_id) }}">{{ history_item.filename }}</a>
+            </td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
+    {% endif %}
+
 </div>
 {% endblock %}

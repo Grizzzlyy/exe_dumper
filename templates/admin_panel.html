@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_nav.html" %}
 
 {% block title %}Admin Panel{% endblock %}
 
@@ -16,19 +16,24 @@
         {% for user in users %}
         <tr>
             <td>{{ user.username }}</td>
+            {% if user.username == current_user.username %}
+            <td>
+                <p>It's you</p>
+            </td>
+            {% else %}
             <td>
                 {% if user.has_access %}
-                <form action="{{ url_for('block_user', username=user.username) }}" method="post"
-                      style="display:inline;">
-                    <button type="submit">Block</button>
+                <form class="action-form" action="{{ url_for('block_user', username=user.username) }}" method="post">
+                    <button class="action-btn block-btn" type="submit">Block</button>
                 </form>
                 {% else %}
-                <form action="{{ url_for('unblock_user', username=user.username) }}" method="post"
-                      style="display:inline;">
-                    <button type="submit">Unblock</button>
+                <form class="action-form" action="{{ url_for('unblock_user', username=user.username) }}" method="post">
+                    <button class="action-btn unblock-btn" type="submit">Unblock</button>
                 </form>
                 {% endif %}
             </td>
+            {% endif %}
+
         </tr>
         {% endfor %}
         </tbody>
