@@ -198,8 +198,8 @@ def show_report(file_id):
 @access_required
 def get_hex_chunk(file_id):
     chunk_idx = request.args.get('chunk_idx', 0, type=int)
-
-    chunk = get_chunk(chunk_idx, "./files/HxD.exe")
+    file_name = get_filename(file_id)
+    chunk = get_chunk(chunk_idx, f'./files/{current_user.username}/{file_name}')
 
     if chunk is None:
         return jsonify({'formatted_hex': None})  # No more chunks to load
