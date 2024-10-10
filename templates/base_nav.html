@@ -4,6 +4,7 @@
 <ul>
     <li><a href="{{ url_for('history') }}">History</a></li>
     <li><a href="{{ url_for('upload') }}">Upload</a></li>
+    <li><a href="{{ url_for('profile') }}">Profile</a></li>
     {% if current_user.is_admin %}
     <li><a href="{{ url_for('admin_panel') }}">Admin Panel</a></li>
     {% endif %}

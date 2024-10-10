@@ -1,99 +1,216 @@
 {% extends "base_nav.html" %}
 
-{% block links %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-{% endblock %}
-
-{% block title %}Upload File{% endblock %}
+{% block title %}Report{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <!-- File Info -->
-        <div class="col-md-6 file-info">
-            <h4 class="section-title">File Info</h4>
-            <table class="table table-bordered">
-                <tbody>
-                <tr>
-                    <td>Filename</td>
-                    <td>
-                        <a href="{{ url_for('get_binary', username=current_user.username ,filename=report.filename) }}"
-                           target="_blank">{{ report.filename }}</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Type</td>
-                    <td>{{ report.type }}</td>
-                </tr>
-                <tr>
-                    <td>Size</td>
-                    <td>{{ report.size }}</td>
-                </tr>
-                <tr>
-                    <td>MD5</td>
-                    <td>{{ report.md5 }}</td>
-                </tr>
-                <tr>
-                    <td>SHA1</td>
-                    <td>{{ report.sha1 }}</td>
-                </tr>
-                <tr>
-                    <td>SHA256</td>
-                    <td>{{ report.sha256 }}</td>
-                </tr>
-                <tr>
-                    <td>SHA512</td>
-                    <td>{{ report.sha512 }}</td>
-                </tr>
-                <tr>
-                    <td>CRC32</td>
-                    <td>{{ report.crc32 }}</td>
-                </tr>
-                <tr>
-                    <td>SSDEEP</td>
-                    <td>{{ report.ssdeep }}</td>
-                </tr>
-                <tr>
-                    <td>Upload Time</td>
-                    <td>{{ report.upload_time }}</td>
-                </tr>
-                </tbody>
-            </table>
+<div id="report_container">
+    <div id="report-info">
+        <div id="report-info-header">
+            <h2>Report info</h2>
+        </div>
+        <div id="report-info-body">
+            <div id="general-information">
+                <details class="dropdown">
+                    <summary>General Information</summary>
+                    <div class="dropdown-content">
+                        <table>
+                            <tr>
+                                <td><strong>Index</strong></td>
+                                <td>{{ report.idx }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Filetype</strong></td>
+                                <td>{{ report.filetype }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </details>
+            </div>
+
+            {% if report.filetype == "exe" %}
+            {% set fields_mapping = { "header_first": "MS_DOS_header",
+            "header_second": "PE_header",
+            "import_table": "Import_table",
+            "export_table": "Export_table"} %}
+            {% else %}
+            {% set fields_mapping = { "header_first": "ELF_header",
+            "header_second": "Segments",
+            "import_table": "Sections",
+            "export_table": "Symbols"} %}
+            {% endif %}
+
+            <div id="header-1">
+                <details class="dropdown">
+                    <summary> {{ fields_mapping["header_first"] }}</summary>
+                    <div class="dropdown-content">
+                        {% for key, value in report["header_first"].items() %}
+                        <details>
+                            <summary>{{ key }}</summary>
+                            <div class="dropdown-content">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <a href="#{{ value.g_offset }}" class="hex-link" offset="{{ value.offset }}"
+                                               length="{{value.length}}"><strong>Value</strong></a>
+                                        </td>
+                                        <td>{{ value.value }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </details>
+            </div>
+
+            <div id="header-2">
+                <details class="dropdown">
+                    <summary> {{ fields_mapping["header_second"] }}</summary>
+                    <div class="dropdown-content">
+                        {% for key, value in report["header_second"].items() %}
+                        <details>
+                            <summary>{{ key }}</summary>
+                            <div class="dropdown-content">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <a href="#{{ value.g_offset }}" class="hex-link" offset="{{ value.offset }}"
+                                               length="{{value.length}}"><strong>Value</strong></a>
+                                        </td>
+                                        <td>{{ value.value }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </details>
+            </div>
+
+            <div id="import-table">
+                <details class="dropdown">
+                    <summary> {{ fields_mapping["import_table"] }}</summary>
+                    <div class="dropdown-content">
+                        {% for dll_name, functions in report["import_table"].items() %}
+                        <details>
+                            <summary>{{ dll_name }}</summary>
+                            <div class="dropdown-content">
+                                {% for function in functions %}
+                                <details>
+                                    <summary>{{ function.function }}</summary>
+                                    <div class="dropdown-content">
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <a href="#{{ function.g_name_offset }}" class="hex-link"
+                                                       offset="{{ function.name_offset }}"
+                                                       length="{{function.name_length}}"><strong>name_offset</strong></a>
+                                                </td>
+                                                <td>{{ function.name_offset }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a href="#{{ function.g_rva_offset_offset }}"
+                                                       class="hex-link"
+                                                       offset="{{ function.rva_offset_offset }}"
+                                                       length="{{function.rva_offset_length}}"><strong>rva_offset</strong></a>
+                                                </td>
+                                                <td>{{ function.rva_offset_offset }}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </details>
+                                {% endfor %}
+                            </div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </details>
+            </div>
+
+            <div id="export-table">
+                <details class="dropdown">
+                    <summary> {{ fields_mapping["export_table"] }}</summary>
+                    <div class="dropdown-content">
+                        {% for dll_name, functions in report["export_table"].items() %}
+                        <details>
+                            <summary>{{ dll_name }}</summary>
+                            <div class="dropdown-content">
+                                {% for function in functions %}
+                                <details>
+                                    <summary>{{ function.function }}</summary>
+                                    <div class="dropdown-content">
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <a href="#{{ function.g_name_offset }}" class="hex-link"
+                                                       offset="{{ function.name_offset }}"
+                                                       length="{{function.name_length}}"><strong>name_offset</strong></a>
+                                                </td>
+                                                <td>{{ function.name_offset }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a href="#{{ function.g_rva_offset_offset }}"
+                                                       class="hex-link"
+                                                       offset="{{ function.rva_offset_offset }}"
+                                                       length="{{function.rva_offset_length}}"><strong>rva_offset</strong></a>
+                                                </td>
+                                                <td>{{ function.rva_offset_offset }}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </details>
+                                {% endfor %}
+                            </div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </details>
+            </div>
+
         </div>
 
-        <!-- Children/Parents -->
-        <div class="col-md-6 relations">
-            <h4 class="section-title">Children/Parents</h4>
-            {% if report.children %}
-            <h5>Children:</h5>
-            <ul>
-                {% for child_id in report.children %}
-                <li><a href="{{ url_for('show_report', report_id=child_id) }}">{{ child_id }}</a></li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            {% if report.parents %}
-            <h5>Parents:</h5>
-            <ul>
-                {% for parent_id in report.parents %}
-                <li><a href="{{ url_for('show_report', report_id=parent_id) }}">{{ parent_id }}</a></li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-        </div>
+
     </div>
 
-    <div class="row">
-        <!-- YARA Rules -->
-        <div class="col-md-6 yara-rules">
-            <h4 class="section-title">YARA Rules</h4>
-            <ul>
-                {% for rule_id in report.yara_matches %}
-                <li><a href="{{ url_for('static', filename='yara/' + rule_id + '.yara') }}">{{ rule_id }}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
+    <div id="hex-view">
+        <h2>Hex Viewer</h2>
+
+        <table class="hex-view-table">
+            <thead class="hex-view-header">
+            <tr>
+                <th class="hex-view-header-item" id="offset-header">Offset (h)</th>
+                <th class="hex-view-header-item" id="hex-header">00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F</th>
+                <th class="hex-view-header-item" id="decoded-text-header">Decoded text</th>
+            </tr>
+            </thead>
+            <tbody class="hex-view-body">
+            <tr>
+                <td class="hex-view-body-item" id="offsets"></td>
+                <td class="hex-view-body-item" id="hex"></td>
+                <td class="hex-view-body-item" id="decoded-text"></td>
+            </tr>
+            </tbody>
+        </table>
+
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+<script src="{{ url_for('static', filename='js/report.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fileId = {{ file_id }};
+        initializeHexViewer(fileId);
+    });
+</script>
 
 {% endblock %}

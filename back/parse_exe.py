@@ -3,6 +3,7 @@ import binascii
 import sys
 import struct
 
+
 def parse_ms_dos(pe):
     try:
         header_data = {}
@@ -12,58 +13,62 @@ def parse_ms_dos(pe):
             field_value = getattr(pe.DOS_HEADER, field[0])
             offset = pe.DOS_HEADER.__file_offset__ + pe.DOS_HEADER.get_field_absolute_offset(field[0])
 
-            offsets_list.append(offset)        #save offset to list to count field_len
+            offsets_list.append(offset)  # save offset to list to count field_len
 
             header_data[field[0]] = {
                 'value': field_value,
                 'offset': offset
             }
 
-        offsets_list.append(pe.DOS_HEADER.sizeof()) #add ms dos size 
+        offsets_list.append(pe.DOS_HEADER.sizeof())  # add ms dos size
         idx = 0
         for field in header_data:
-            field_length = offsets_list[idx+1] - offsets_list[idx] 
+            field_length = offsets_list[idx + 1] - offsets_list[idx]
             header_data[field]['length'] = field_length
-            field_value = header_data[field]['value'] 
-            header_data[field]['value'] = field_value.to_bytes(field_length, 'little').hex() if isinstance(field_value, int) else field_value.hex()
-            idx+=1
+            field_value = header_data[field]['value']
+            header_data[field]['value'] = field_value.to_bytes(field_length, 'little').hex() if isinstance(field_value,
+                                                                                                           int) else field_value.hex()
+            idx += 1
         return header_data
     except Exception as e:
         print(e)
+
 
 def parse_pe_header(pe):
     header_data = {}
     offsets_list = []
     field_value = pe.NT_HEADERS.Signature
     header_data['Signature'] = {
-            'value': field_value.to_bytes(4,'little').hex(),
-            'offset': pe.NT_HEADERS.get_field_absolute_offset('Signature'),
-            'length': 4
-        }
+        'value': field_value.to_bytes(4, 'little').hex(),
+        'offset': pe.NT_HEADERS.get_field_absolute_offset('Signature'),
+        'length': 4
+    }
     tmp_dict = {}
     for field in pe.FILE_HEADER.__keys__:
         field_value = getattr(pe.FILE_HEADER, field[0])
         offset = pe.FILE_HEADER.get_field_absolute_offset(field[0])
 
-        offsets_list.append(offset)        #save offset to list to count field_len
+        offsets_list.append(offset)  # save offset to list to count field_len
         value = field_value
-        
+
         tmp_dict[field[0]] = {
             'value': value,
             'offset': offset
         }
 
-    offsets_list.append(offsets_list[0] + pe.FILE_HEADER.sizeof()) #add header size 
+    offsets_list.append(offsets_list[0] + pe.FILE_HEADER.sizeof())  # add header size
 
     idx = 0
     for field in tmp_dict:
-        field_length = offsets_list[idx+1] - offsets_list[idx] 
+        field_length = offsets_list[idx + 1] - offsets_list[idx]
         tmp_dict[field]['length'] = field_length
-        field_value = tmp_dict[field]['value'] 
-        tmp_dict[field]['value'] = field_value.to_bytes(field_length, 'little').hex() if isinstance(field_value, int) else field_value.hex()
-        idx+=1
+        field_value = tmp_dict[field]['value']
+        tmp_dict[field]['value'] = field_value.to_bytes(field_length, 'little').hex() if isinstance(field_value,
+                                                                                                    int) else field_value.hex()
+        idx += 1
     header_data |= tmp_dict
     return header_data
+
 
 def parse_imports(pe):
     imports_data = {}
@@ -95,12 +100,13 @@ def parse_imports(pe):
                     'function': func_name,
                     'name_offset': imp.name_offset,
                     'name_length': len(func_name),
-                    'rva_offset':imp.hint_name_table_rva,
-                    'rva_offset_offset':imp.ordinal_offset,
-                    'rva_offset_length':length
+                    'rva_offset': imp.hint_name_table_rva,
+                    'rva_offset_offset': imp.ordinal_offset,
+                    'rva_offset_length': length
                 })
-    
+
     return imports_data
+
 
 def parse_exports(pe):
     exports_data = {}
@@ -133,12 +139,13 @@ def parse_exports(pe):
                 'function': func_name,
                 'name_offset': exp.name_offset,
                 'name_length': len(func_name),
-                'rva_offset':exp.address,
-                'rva_offset_offset':exp.address_offset,
-                'rva_offset_length':length
+                'rva_offset': exp.address,
+                'rva_offset_offset': exp.address_offset,
+                'rva_offset_length': length
             })
-    
+
     return exports_data
+
 
 def parse(file_path):
     # Open PE file
@@ -146,9 +153,7 @@ def parse(file_path):
     exe_data = {}
     parsed_imports = parse_imports(pe)
     parsed_exports = parse_exports(pe)
-    parsed_ms_dos= parse_ms_dos(pe)
+    parsed_ms_dos = parse_ms_dos(pe)
     parsed_pe_header = parse_pe_header(pe)
 
     return parsed_ms_dos, parsed_pe_header, parsed_exports, parsed_imports
-   
-

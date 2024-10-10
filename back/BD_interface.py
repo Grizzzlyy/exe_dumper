@@ -31,12 +31,18 @@ class BD_int():
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s')
 
-    def __insert_file(self, username, file_type, header_first, header_second, import_table, export_table,file_name):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.conn.close()
+
+    def __insert_file(self, username, file_type, header_first, header_second, import_table, export_table, file_name):
         self.cursor.execute('''
             INSERT INTO files (username, filetype, header_first, header_second, import_table, export_table, file_name)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (username, file_type, json.dumps(header_first), json.dumps(header_second), json.dumps(import_table),
-              json.dumps(export_table),file_name))
+              json.dumps(export_table), file_name))
         self.conn.commit()
         generated_id = self.cursor.lastrowid
         logging.info(f"[SUCCESS] File with id:{generated_id} added")
@@ -91,8 +97,8 @@ class BD_int():
 
             if 'application' in file_type and ('portable-executable' in file_type or 'x-dosexec' in file_type):
                 file_id = self.__insert_exe(username, file_path)
-            elif file_type == 'application/x-executable':
-                file_id = self.__insert_elf(file_path)
+            elif 'application' in file_type and 'exec' in file_type:
+                file_id = self.__insert_elf(file_path,file_path)
             return file_id
         except Exception as e:
             logging.info(e)
@@ -103,15 +109,31 @@ class BD_int():
         res = res.fetchone()
         return res == (1,)
 
-    def ban_user(self, admin, username):
+    def get_user_name(self, email):
         try:
-            if not self.check_admin(admin):
-                raise ValueError(f"Not an admin:{admin} try to ban user:{username}")
-            if self.check_admin(username):
-                raise ValueError(f"Try to ban admin:{username}")
-            self.cursor.execute("UPDATE users set is_blocked = 1 WHERE username = ?", (username,))
+            username = self.cursor.execute("SELECT username FROM users WHERE email = ?", (email,)).fetchone()[0]
+            return username
+        except Exception as e:
+            logging.info(f"[ERROR] {e}")
+            return None
+
+    def get_email(self, username):
+        try:
+            email = self.cursor.execute("SELECT email FROM users WHERE username = ?", (username,)).fetchone()[0]
+            return email
+        except Exception as e:
+            logging.info(f"[ERROR] {e}")
+            return None
+
+    def change_user_access(self, username, ban):
+        try:
+            status = 1 if ban == True else 0
+            self.cursor.execute(f"UPDATE users set is_blocked = {status} WHERE username = ?", (username,))
             self.conn.commit()
-            logging.info(f"[SUCCESS] user:{username} is blocked")
+            if status == 1:
+                logging.info(f"[SUCCESS] user:{username} is blocked")
+            else:
+                logging.info(f"[SUCCESS] user:{username} is unblocked")
         except Exception as e:
             logging.info(f"[ERROR] {e}")
 
@@ -122,16 +144,16 @@ class BD_int():
         except Exception as e:
             logging.info(f"[ERROR] {e}")
 
-    # TODO use self.conn etc, like you want
-    def get_report(self, file_id):
+    def get_report(self, username, file_id):
         self.conn.row_factory = sqlite3.Row  # gets strings as a dict
         self.cursor = self.conn.cursor()
         report = self.cursor.execute(f'SELECT * FROM files WHERE idx = {file_id}').fetchone()
-
         self.conn.close()
 
         if report is not None:
             report = dict(report)
+            if report["username"] != username:
+                return None
             del report["username"]
             json_fields = ["header_first", "header_second", "import_table", "export_table"]
             for k in json_fields:
@@ -139,7 +161,62 @@ class BD_int():
 
         return report
 
+    def get_user_info(self, username=None, email=None):
+        try:
+            if not username and not email:
+                raise ValueError("Either 'username' or 'email' must be provided")
+
+            condition = "email = ?" if email else "username = ?"
+            param = email if email else username
+
+            report = self.cursor.execute(
+                f'SELECT username, email, is_admin, is_blocked, pwd_hash FROM users WHERE {condition}',
+                (param,)).fetchone()
+
+            if report is None:
+                return None  # Можно также выбросить исключение или вернуть ошибку
+
+            user_info = {
+                'username': report[0],
+                'email': report[1],
+                'is_admin': bool(report[2]),
+                'has_access': not bool(report[3]),
+                'pwd_hash': report[4]
+            }
+
+            return user_info
+        except Exception as e:
+            logging.info(f"[ERROR]: e")
+            return e
+
+    def get_list_of_users(self):
+        query = "SELECT username, is_admin, is_blocked, email FROM users"
+        users = self.cursor.execute(query).fetchall()
+
+        # Преобразование результата в список словарей
+        result = [
+            {
+                "username": user[0],
+                "has_access": not user[2],  # Обратное значение is_blocked
+                "email": user[3]
+            }
+            for user in users
+        ]
+        return result
+
+    def get_filename_by_idx(self, username, file_idx):
+        answer = self.cursor.execute(f"SELECT file_name, username from files WHERE idx = {file_idx}").fetchone()
+        if not answer or username != answer[1]:
+            return None
+        return answer[0]
+
+    def get_history(self, username):
+        answer = self.cursor.execute(f'SELECT idx, file_name from files WHERE username = ?', (username,)).fetchall()
+        report = [{"file_id": row[0], "filename": row[1]} for row in answer]
+        return report
+
     def __del__(self):
+        # print("deleted")
         self.conn.close()
 
 

@@ -1,8 +1,53 @@
-{% extends "base.html" %}
+{% extends "base_nav.html" %}
 
 {% block title %}Admin Panel{% endblock %}
 
 {% block content %}
+<div id="admin-panel-container">
     <h2>Admin Panel</h2>
-    <p>Manage users and settings here.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Username</th>
+            <th>Access</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            {% if user.username == current_user.username %}
+            <td>
+                <p>It's you</p>
+            </td>
+            {% else %}
+            <td>
+                {% if user.has_access %}
+                <form class="action-form" action="{{ url_for('block_user', username=user.username) }}" method="post">
+                    <button class="action-btn block-btn" type="submit">Block</button>
+                </form>
+                {% else %}
+                <form class="action-form" action="{{ url_for('unblock_user', username=user.username) }}" method="post">
+                    <button class="action-btn unblock-btn" type="submit">Unblock</button>
+                </form>
+                {% endif %}
+            </td>
+            {% endif %}
+
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+</div>
+
 {% endblock %}
