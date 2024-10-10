@@ -1,0 +1,62 @@
+{% extends "base_nav.html" %}
+
+{% block title %}History{% endblock %}
+
+{% block content %}
+<div id="history-container">
+    <h2>Profile</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Username</td>
+            <td>{{ current_user.username }}</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>{{ current_user.email }}</td>
+        </tr>
+        <tr>
+            <td>Admin</td>
+            <td>{{ current_user.is_admin }}</td>
+        </tr>
+        <tr>
+            <td>API key</td>
+            <td>
+                <span id="api-key-display">
+                    {{ profile_info.api_key[:8] }}...{{ profile_info.api_key[-8:] }}
+                </span>
+                <button id="copy-button" onclick="copyApiKey()">Copy</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+function copyApiKey() {
+    // Create a temporary text area element to hold the API key
+    const tempInput = document.createElement('textarea');
+    tempInput.value = "{{ profile_info.api_key }}";
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    tempInput.setSelectionRange(0, 99999);  // For mobile devices
+
+    // Copy the text inside the text field
+    document.execCommand("copy");
+
+    // Remove the temporary element
+    document.body.removeChild(tempInput);
+
+    // Optionally give feedback to the user
+    alert("API key copied to clipboard!");
+}
+
+</script>
+{% endblock %}

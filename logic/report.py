@@ -1,6 +1,11 @@
-import datetime
+"""
+Report logic
+"""
+
 import os
+
 from werkzeug.utils import secure_filename
+
 from back.BD_interface import BD_int
 
 UPLOADS_DIR = os.getenv("UPLOADS_DIR")

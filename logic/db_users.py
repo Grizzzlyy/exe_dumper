@@ -51,6 +51,6 @@ def get_filename(file_idx):
         return worker.get_filename_by_idx(file_idx)
 
 
-def create_token(username):
+def create_api_token(username):
     access_token = create_access_token(identity=username)
     return access_token

@@ -6,7 +6,7 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from flask_login import LoginManager, UserMixin, login_required, logout_user, current_user, login_user
 
 from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, send_otp_code
-from logic.db_users import get_user_info, add_user, change_user_access, get_list_of_users, get_history
+from logic.db_users import get_user_info, add_user, change_user_access, get_list_of_users, get_history, create_api_token
 from logic.report import create_report
 from logic import user_manage
 from logic import api
@@ -216,6 +216,13 @@ def get_hex_chunk(file_id):
 def get_binary(username, filename):
     dir = os.path.join(UPLOADS_DIR, current_user.username)
     return send_from_directory(dir, filename)
+
+@app.route('/profile')
+@access_required
+def profile():
+    api_key = create_api_token(current_user.username)
+    profile_info = {"api_key": api_key}
+    return render_template('profile.html', profile_info=profile_info)
 
 
 @app.route('/admin_panel')
