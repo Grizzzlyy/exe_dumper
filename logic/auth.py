@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup as bs
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from logic.db_users import get_user_info
+from os import getenv
 
 
 def generate_pwd_hash(password):
@@ -43,7 +44,7 @@ def gen_otp(length=6):
 
 def send_mail(email, FROM, TO, msg):
     # TODO доставать из БД
-    password = "bolgragtofyqnmho"
+    password = getenv["MAIL_PWD"]
 
     server = smtplib.SMTP_SSL("smtp.yandex.ru")
     server.login(email, password)
