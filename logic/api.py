@@ -5,14 +5,35 @@ from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
 from flasgger import Swagger, swag_from
 
-from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
+from back.parse_file import get_chunk
 # from flask_login import login_required
 
 from back.BD_interface import BD_int
 
+swagger_template = {
+    "swagger": "2.0",
+    "info": {
+        "title": "Your API",
+        "description": "API documentation",
+        "version": "1.0"
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Enter JWT token like: Bearer <token>"
+        }
+    },
+    "security": [
+        {
+            "Bearer": []
+        }
+    ]
+}
 
 class Report(Resource):
     @swag_from({
@@ -35,7 +56,7 @@ class Report(Resource):
                 'name': 'file_id',
                 'description': 'ID of the file to get report fields',
                 'in': 'path',
-                'type': 'string',
+                'type': 'string',  
                 'required': True
             }
         ]
@@ -48,7 +69,7 @@ class Report(Resource):
         if not report:
             return {'message': 'Report not found'}, 404
         else:
-            return jsonify(report)
+            return jsonify(report) 
 
 
 class HistoryClass(Resource):
@@ -68,32 +89,20 @@ class HistoryClass(Resource):
             404: {
                 'description': 'History not found'
             }
-        },
-        'parameters': [
-            {
-                'token': 'your generatet token'
-            },
-            {
-                'name': 'username',
-                'description': 'Username to get report history',
-                'in': 'path',
-                'type': 'string',
-                'required': True
-            }
-        ]
+        }
     })
     @jwt_required()
-    def get(self, username):
+    def get(self):
+        username = get_jwt_identity()
         with BD_int() as bd:
             history = bd.get_history(username)
 
         if not history:
             return {'message': 'History not found'}, 404
         else:
-            return jsonify(history)
+            return jsonify(history)  
 
-
-class CunkFile(Resource):
+class ChunkFile(Resource):
     @swag_from({
         'responses': {
             200: {
@@ -110,25 +119,25 @@ class CunkFile(Resource):
         },
         'parameters': [
             {
-                ''
-            },
-            {
-                'name': 'file_name',
-                'description': 'name of file to get chunk from it',
+                'name': 'file_idx',
+                'description': 'idx of file to get chunk from it',
                 'in': 'path',
-                'type': 'string',
+                'type': 'string',  
                 'required': True
             }
         ]
     })
-    def get():
-        pass
-
+    def get(self,file_idx):
+        username = get_jwt_identity()
+        with BD_int() as worker:
+            worker.get_filename_by_idx()
+        print(username)
 
 def init(app):
     api = Api(app)
-    swagger = Swagger(app)
-    api.add_resource(Report, '/api/report/<string:file_id>')
-    api.add_resource(HistoryClass, '/api/report_history/<string:username>')
+    
+    api.add_resource(Report, '/api/report/<string:file_id>') 
+    api.add_resource(HistoryClass, '/api/report_history')
     app.config["JWT_SECRET_KEY"] = getenv("JWT_SECRET_KEY")
+    swagger = Swagger(app, template=swagger_template)
     jwt = JWTManager(app)

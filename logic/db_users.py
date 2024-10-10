@@ -46,9 +46,9 @@ def get_history(username):
         return worker.get_history(username)
 
 
-def get_filename(file_idx):
+def get_filename(username, file_idx):
     with BD_int() as worker:
-        return worker.get_filename_by_idx(file_idx)
+        return worker.get_filename_by_idx(username,file_idx)
 
 
 def create_api_token(username):

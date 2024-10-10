@@ -144,7 +144,6 @@ class BD_int():
         except Exception as e:
             logging.info(f"[ERROR] {e}")
 
-    # TODO use self.conn etc, like you want
     def get_report(self, file_id):
         self.conn.row_factory = sqlite3.Row  # gets strings as a dict
         self.cursor = self.conn.cursor()
@@ -204,9 +203,11 @@ class BD_int():
         ]
         return result
 
-    def get_filename_by_idx(self, file_idx):
-        answer = self.cursor.execute(f"SELECT file_name from files WHERE idx = {file_idx}").fetchone()[0]
-        return answer
+    def get_filename_by_idx(self, username, file_idx):
+        answer = self.cursor.execute(f"SELECT file_name, username from files WHERE idx = {file_idx}").fetchone()
+        if username != answer[1]:
+            return None
+        return answer[0]
 
     def get_history(self, username):
         answer = self.cursor.execute(f'SELECT idx, file_name from files WHERE username = ?', (username,)).fetchall()

@@ -198,7 +198,7 @@ def show_report(file_id):
 @access_required
 def get_hex_chunk(file_id):
     chunk_idx = request.args.get('chunk_idx', 0, type=int)
-    file_name = get_filename(file_id)
+    file_name = get_filename(current_user.username,file_id)
     chunk = get_chunk(chunk_idx, f'./files/{current_user.username}/{file_name}')
 
     if chunk is None:
@@ -214,7 +214,7 @@ def get_hex_chunk(file_id):
 @app.route('/uploads/<int:file_id>')
 @access_required
 def get_binary(file_id):
-    filename = get_filename(file_id)
+    filename = get_filename(current_user.username, file_id)
     dir = os.path.join(UPLOADS_DIR, current_user.username)
     return send_from_directory(dir, filename)
 
@@ -222,7 +222,8 @@ def get_binary(file_id):
 @access_required
 def profile():
     api_key = create_api_token(current_user.username)
-    profile_info = {"api_key": api_key}
+    #TODO сохранять в бд, если его там нет и доставать от туда
+    profile_info = {"api_key": 'Bearer ' + api_key}
     return render_template('profile.html', profile_info=profile_info)
 
 
