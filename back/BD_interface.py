@@ -144,15 +144,16 @@ class BD_int():
         except Exception as e:
             logging.info(f"[ERROR] {e}")
 
-    def get_report(self, file_id):
+    def get_report(self, username, file_id):
         self.conn.row_factory = sqlite3.Row  # gets strings as a dict
         self.cursor = self.conn.cursor()
         report = self.cursor.execute(f'SELECT * FROM files WHERE idx = {file_id}').fetchone()
-
         self.conn.close()
 
         if report is not None:
             report = dict(report)
+            if report["username"] != username:
+                return None
             del report["username"]
             json_fields = ["header_first", "header_second", "import_table", "export_table"]
             for k in json_fields:
@@ -205,7 +206,7 @@ class BD_int():
 
     def get_filename_by_idx(self, username, file_idx):
         answer = self.cursor.execute(f"SELECT file_name, username from files WHERE idx = {file_idx}").fetchone()
-        if username != answer[1]:
+        if not answer or username != answer[1]:
             return None
         return answer[0]
 

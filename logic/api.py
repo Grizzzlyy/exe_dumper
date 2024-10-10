@@ -63,8 +63,9 @@ class Report(Resource):
     })
     @jwt_required()
     def get(self, file_id):
+        username = get_jwt_identity()
         with BD_int() as bd:
-            report = bd.get_report(file_id)
+            report = bd.get_report(username,file_id)
 
         if not report:
             return {'message': 'Report not found'}, 404
@@ -102,42 +103,61 @@ class HistoryClass(Resource):
         else:
             return jsonify(history)  
 
-class ChunkFile(Resource):
+class some(Resource):
     @swag_from({
         'responses': {
             200: {
-                'description': 'Successful retrieval of report fields',
+                'description': 'some_awesome',
                 'examples': {
                     'application/json': {
-                        '4D 5A 50 00 02 00 00 00 04 00 0F 00 FF FF 00 00 B8 00 00 00 00 00 00 00 40 00 1A 00 00 00 00 00'
+                        'chunk': '4D 5A 50 00 02 00 00 00 04 00 0F 00 FF FF 00 00'
                     }
                 }
             },
             404: {
-                'description': 'Report not found'
+                'description': 'History not found'
             }
         },
         'parameters': [
             {
                 'name': 'file_idx',
-                'description': 'idx of file to get chunk from it',
+                'description': 'ID of the file to get report fields',
                 'in': 'path',
-                'type': 'string',  
+                'type': 'integer',  
+                'required': True
+            },
+            {
+                'name': 'chunk_number',
+                'description': 'Number of chunk you wants to get',
+                'in': 'path',
+                'type': 'integer',  
                 'required': True
             }
         ]
     })
-    def get(self,file_idx):
+    @jwt_required()
+    def get(self, file_idx, chunk_number):
         username = get_jwt_identity()
         with BD_int() as worker:
-            worker.get_filename_by_idx()
-        print(username)
+            file_name = worker.get_filename_by_idx(username,file_idx)
+        if not file_name:
+            return {'message': 'No such file'}, 404
+        else:
+            file_dir = getenv("UPLOADS_DIR")
+            str_chunk = get_chunk(chunk_number, f"./{file_dir}/{username}/{file_name}")
+            if not str_chunk:
+                return{'message': 'Something wrong with chunk_number'},404
+
+            return jsonify({'chunk': str_chunk})
+
+
 
 def init(app):
     api = Api(app)
-    
-    api.add_resource(Report, '/api/report/<string:file_id>') 
+    swagger = Swagger(app, template=swagger_template)
+    api.add_resource(Report,'/api/report/<string:file_id>') 
+    api.add_resource(some,'/api/chunk/<int:file_idx>/<int:chunk_number>')
     api.add_resource(HistoryClass, '/api/report_history')
     app.config["JWT_SECRET_KEY"] = getenv("JWT_SECRET_KEY")
-    swagger = Swagger(app, template=swagger_template)
+
     jwt = JWTManager(app)

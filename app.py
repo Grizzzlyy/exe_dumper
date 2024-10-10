@@ -190,7 +190,7 @@ def history():
 @app.route('/report/<int:file_id>', methods=['GET', 'POST'])
 @access_required
 def show_report(file_id):
-    report = get_report_info(file_id)
+    report = get_report_info(current_user.username,file_id)
     return render_template('report.html', report=report, file_id=file_id)
 
 
