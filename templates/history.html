@@ -18,8 +18,11 @@
         <tbody>
         {% for history_item in history %}
         <tr>
-            <td>{{ history_item.file_id }}</td>
-            <td><a href="{{ url_for('show_report', file_id=history_item.file_id) }}">{{ history_item.filename }}</a>
+            <td>
+                <a href="{{ url_for('show_report', file_id=history_item.file_id) }}">{{ history_item.file_id }}</a>
+            </td>
+            <td>
+                <a href="{{ url_for('get_binary', file_id=history_item.file_id) }}">{{ history_item.filename }}</a>
             </td>
         </tr>
         {% endfor %}

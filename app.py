@@ -6,7 +6,7 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from flask_login import LoginManager, UserMixin, login_required, logout_user, current_user, login_user
 
 from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, send_otp_code
-from logic.db_users import get_user_info, add_user, change_user_access, get_list_of_users, get_history, create_api_token
+from logic.db_users import get_user_info, add_user, change_user_access, get_list_of_users, get_history, create_api_token, get_filename
 from logic.report import create_report
 from logic import user_manage
 from logic import api
@@ -211,9 +211,10 @@ def get_hex_chunk(file_id):
 
 
 # Download binary from report
-@app.route('/uploads/<string:username>/<string:filename>')
+@app.route('/uploads/<int:file_id>')
 @access_required
-def get_binary(username, filename):
+def get_binary(file_id):
+    filename = get_filename(file_id)
     dir = os.path.join(UPLOADS_DIR, current_user.username)
     return send_from_directory(dir, filename)
 
