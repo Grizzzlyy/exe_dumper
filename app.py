@@ -222,7 +222,6 @@ def get_binary(file_id):
 @access_required
 def profile():
     api_key = create_api_token(current_user.username)
-    #TODO сохранять в бд, если его там нет и доставать от туда
     profile_info = {"api_key": 'Bearer ' + api_key}
     return render_template('profile.html', profile_info=profile_info)
 
