@@ -15,7 +15,7 @@ services:
   # Main app
   exe_dumper:
     container_name: exe_dump
-    image: exe_dumper:1
+    image: exe_dumper:2
     ports:
       - "80:5000"
     restart: always
