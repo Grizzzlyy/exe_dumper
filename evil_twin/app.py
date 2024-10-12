@@ -1,12 +1,14 @@
-import psycopg2
+from os import getenv
 
+import psycopg2
+from dotenv import load_dotenv
 from flask import Flask, render_template, redirect, url_for, request
 
 app = Flask(__name__)
 
 global conn
 global cursor
-
+load_dotenv()
 
 @app.route('/')
 def index():
@@ -39,11 +41,11 @@ def oops():
 
 if __name__ == '__main__':
     conn = psycopg2.connect(
-        host="51.250.114.148",
-        port="5432",
-        database="evil",
-        user="evil_user",
-        password="evil_user_pass"
+        host=getenv("DB_IP"),
+        port=getenv("DB_PORT"),
+        database=getenv("DB_NAME"),
+        user=getenv("DB_USER_NAME"),
+        password=getenv("DB_USER_PASSWD")
     )
     cursor = conn.cursor()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0')

@@ -1,6 +1,9 @@
 create database evil;
 create user evil_user with password 'evil_user_pass';
 
+grant connect on database evil to evil_user;
+
+-- on evil db
 create table evil_info
 (
     id       serial primary key,
@@ -9,9 +12,6 @@ create table evil_info
     unique (login, password)
 );
 
-grant connect on database evil to evil_user;
-
--- on evil db
 grant usage on schema public to evil_user;
 grant all privileges on all tables in schema public to evil_user;
 grant all privileges on all sequences in schema public to evil_user;
