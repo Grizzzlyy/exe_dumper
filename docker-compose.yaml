@@ -23,7 +23,7 @@ services:
   # Evil twin
   evil_dumper:
     container_name: evil_dump
-    image: evil_dumper:1.1
+    image: evil_dumper:1.2
     ports:
       - "8080:5000"
     restart: always
