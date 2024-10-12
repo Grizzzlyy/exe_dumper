@@ -98,7 +98,7 @@ class BD_int():
             if 'application' in file_type and ('portable-executable' in file_type or 'x-dosexec' in file_type):
                 file_id = self.__insert_exe(username, file_path)
             elif 'application' in file_type and 'exec' in file_type:
-                file_id = self.__insert_elf(file_path,file_path)
+                file_id = self.__insert_elf(username,file_path)
             return file_id
         except Exception as e:
             logging.info(e)
