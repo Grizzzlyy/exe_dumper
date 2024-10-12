@@ -51,7 +51,7 @@ def send_mail(email, FROM, TO, msg):
     server.quit()
 
 
-def send_otp_code(usermail, email="exe.dumper@yandex.ru"):
+def send_otp_code(usermail, email=getenv("MAIL_ADDR")):
     code = gen_otp()
 
     msg = MIMEMultipart("alternative")
