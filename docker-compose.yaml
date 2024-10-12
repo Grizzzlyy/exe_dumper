@@ -14,9 +14,7 @@ services:
   # Main app
   exe_dumper:
     container_name: exe_dump
-    image: exe_dumper:2.2
-    ports:
-      - "5000:5000"
+    image: exe_dumper:2.6
     restart: always
     volumes:
       - exe_dumper_files:/app/files
