@@ -15,12 +15,13 @@ services:
   # Main app
   exe_dumper:
     container_name: exe_dump
-    image: exe_dumper:2.1
+    image: exe_dumper:2.2
     ports:
       - "80:5000"
     restart: always
     volumes:
       - exe_dumper_files:/app/files
+      - exe_dumper_bd:/app/BD
 
   # Evil twin
   evil_dumper:
@@ -44,3 +45,4 @@ volumes:
   database_dbdata:
     external: true
   exe_dumper_files:
+  exe_dumper_bd:
