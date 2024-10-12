@@ -43,7 +43,7 @@ def gen_otp(length=6):
 
 
 def send_mail(email, FROM, TO, msg):
-    password = getenv["MAIL_PWD"]
+    password = getenv("MAIL_PWD")
 
     server = smtplib.SMTP_SSL("smtp.yandex.ru")
     server.login(email, password)
