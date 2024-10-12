@@ -30,6 +30,16 @@ services:
       - "8080:5000"
     restart: always
 
+  # Танец с бубном для настройки сертификата
+  nginx_proxy:
+    image: nginx:latest
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - exe_dumper
+
 volumes:
   database_dbdata:
     external: true
