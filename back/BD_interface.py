@@ -62,7 +62,7 @@ class BD_int():
     def __insert_elf(self, username, file_path):
         header, segments, sections, symbols = parse_elf.parse_elf_header(file_path)
         file_id = self.__insert_file(username=username,
-                                     file_type='exe',
+                                     file_type='elf',
                                      header_first=header,
                                      header_second=segments,
                                      import_table=sections,
