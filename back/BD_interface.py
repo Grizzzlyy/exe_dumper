@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 
 from back import parse_elf
 from back import parse_exe
-from back.parse_file import get_chunk
 
 load_dotenv()
 
@@ -154,19 +153,12 @@ class BD_int():
 
     def get_report(self, username, file_id):
         tmp_cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Возвращать строки как словарь
-        tmp_cursor.execute('SELECT * FROM files WHERE idx = %s', (file_id,))
+        tmp_cursor.execute('SELECT * FROM files WHERE idx = %s AND username = %s', (file_id, username,))
         report = tmp_cursor.fetchone()
-
 
         if report is not None:
             report = dict(report)
-
-            if report["username"] != username:
-                return None
             del report["username"]
-            json_fields = ["header_first", "header_second", "import_table", "export_table"]
-            for k in json_fields:
-                report[k] = json.loads(report[k])
 
         return report
 
