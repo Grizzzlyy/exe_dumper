@@ -3,12 +3,13 @@ import smtplib
 import string
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formataddr
+from os import getenv
 
 from bs4 import BeautifulSoup as bs
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from logic.db_users import get_user_info
-from os import getenv
 
 
 def generate_pwd_hash(password):
@@ -55,7 +56,7 @@ def send_otp_code(usermail, email=getenv("MAIL_ADDR")):
     code = gen_otp()
 
     msg = MIMEMultipart("alternative")
-    msg["From"] = email
+    msg["From"] = formataddr((str(Header("ExeDumper", 'utf-8')), "exe.dumper@yandex.ru"))
     msg["To"] = usermail
     msg["Subject"] = "ExeDumper authentication code"
 
