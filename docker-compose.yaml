@@ -1,0 +1,49 @@
+services:
+  # Database
+  postgres:
+    container_name: BIPdb
+    image: postgres:16.4
+    env_file:
+      - /app/exe_dumper/.env-database
+    volumes:
+      - database_dbdata:/app/database/data/postgres
+    ports:
+      - "127.0.0.1:5432:5432"
+    restart: always
+  
+  # Main app
+  exe_dumper:
+    container_name: exe_dump
+    image: exe_dumper:3.3
+    restart: always
+    volumes:
+      - exe_dumper_files:/app/files
+      - exe_dumper_bd:/app/BD
+
+  # Evil twin
+  evil_dumper:
+    container_name: evil_dump
+    image: evil_dumper:1.4
+    ports:
+      - "8080:5000"
+    restart: always
+
+  # Танец с бубном для настройки сертификата
+  nginx_proxy:
+    image: nginx:latest
+    volumes:
+      - ./nginx/cert.pem:/etc/nginx/cert.pem
+      - ./nginx/key.pem:/etc/nginx/key.pem
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - exe_dumper
+    restart: always
+
+volumes:
+  database_dbdata:
+    external: true
+  exe_dumper_files:
+  exe_dumper_bd:
