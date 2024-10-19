@@ -13,7 +13,8 @@ UPLOADS_DIR = os.getenv("UPLOADS_DIR")
 
 def create_report(username, file):
     filename = secure_filename(file.filename)
-    dir = os.path.join(UPLOADS_DIR, username)
+    up_dir = os.path.join(os.getcwd(), UPLOADS_DIR)
+    dir = os.path.join(up_dir, username)
     os.makedirs(dir, exist_ok=True)
     file.save(os.path.join(dir, filename))
     worker = BD_int()
