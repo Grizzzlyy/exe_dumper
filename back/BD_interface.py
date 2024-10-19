@@ -90,7 +90,7 @@ class BD_int():
             if not self.user_exists(username):
                 self.cursor.execute("""
                                     INSERT INTO users (username, is_admin, is_blocked, email, pwd_hash) 
-                                    VALUES (%s, 0, 0, %s, %s)
+                                    VALUES (%s, false, false, %s, %s)
                                     """, (username, email, pwd_hash))
                 self.conn.commit()
                 logging.info(f"[SUCCESS] user {username} was added to users table")
