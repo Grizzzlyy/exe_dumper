@@ -4,6 +4,7 @@ from functools import wraps
 from dotenv import load_dotenv
 from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory, jsonify
 from flask_login import LoginManager, UserMixin, login_required, logout_user, current_user, login_user
+from markupsafe import escape
 
 from logic.auth import is_user_exists, check_user_password, generate_pwd_hash, check_pwd_hash, send_otp_code
 from logic.db_users import get_user_info, add_user, change_user_access, get_list_of_users, get_history, create_api_token, get_filename
@@ -72,9 +73,11 @@ def index():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
+        if current_user.is_authenticated:  # Defence against CSRF
+            logout_user()
+        username = escape(request.form['username'])
+        email = escape(request.form['email'])
+        password = escape(request.form['password'])
 
         # Check if the username or email already exists
         if is_user_exists(username):
@@ -97,9 +100,11 @@ def signup():
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
     if request.method == 'POST':
+        if current_user.is_authenticated:  # Defence against CSRF
+            logout_user()
         if 'login' in request.form and 'password' in request.form:
-            login = request.form['login']
-            password = request.form['password']
+            login = escape(request.form['login'])
+            password = escape(request.form['password'])
 
             if check_user_password(login, password):
                 user_info = get_user_info(login)
@@ -128,7 +133,7 @@ def check_mail_code():
         if 'send_code' in request.form:
             session['otp_code_hash'] = send_otp_code(session.get('email'))
         elif 'verify_code' in request.form:
-            code = request.form['code']
+            code = escape(request.form['code'])
             code_hash = session.get('otp_code_hash')
 
             if check_pwd_hash(code_hash, code):
