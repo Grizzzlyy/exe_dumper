@@ -8,7 +8,7 @@
 
     <form method="POST">
         <label for="code">Enter verification code sent to your email ({{session.get('email')}}):</label>
-        <input type="text" id="code" name="code" required>
+        <input type="text" id="code" name="code" autocomplete="off" required>
         <br>
         <button type="submit" name="verify_code">Verify Code</button>
     </form>
