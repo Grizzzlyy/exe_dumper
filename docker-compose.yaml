@@ -14,7 +14,7 @@ services:
   # Main app
   exe_dumper:
     container_name: exe_dump
-    image: exe_dumper:4.5
+    image: exe_dumper:4.6
     restart: always
     volumes:
       - exe_dumper_files:/app/files
@@ -25,7 +25,7 @@ services:
     container_name: evil_dump
     image: evil_dumper:1.4
     ports:
-      - "8080:5000"
+      - "9090:5000"
     restart: always
 
   # Танец с бубном для настройки сертификата
