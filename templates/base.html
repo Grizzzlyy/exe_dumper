@@ -6,15 +6,28 @@
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     {% block links %}{% endblock %}
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V1FEE03L5L"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-V1FEE03L5L');
+    </script>
 </head>
 <body>
 
-    <nav>
-        {% block nav %}{% endblock %}
-    </nav>
+<nav>
+    {% block nav %}{% endblock %}
+</nav>
 
-    <div class="content">
-        {% block content %}{% endblock %}
-    </div>
+<div class="content">
+    {% block content %}{% endblock %}
+</div>
 </body>
 </html>
