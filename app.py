@@ -2,7 +2,7 @@ import os
 from functools import wraps
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory, jsonify
+from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory, jsonify, abort
 from flask_login import LoginManager, UserMixin, login_required, logout_user, current_user, login_user
 from markupsafe import escape
 
@@ -196,6 +196,10 @@ def history():
 @access_required
 def show_report(file_id):
     report = get_report_info(current_user.username,file_id)
+
+    if report is None:
+        abort(403, description="Wrong report number or access denied")  # Raise a 403 Forbidden error
+
     return render_template('report.html', report=report, file_id=file_id)
 
 

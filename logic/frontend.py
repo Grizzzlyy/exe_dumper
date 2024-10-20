@@ -11,6 +11,9 @@ def get_report_info(username,file_id):
     with BD_int() as bd:
         report = bd.get_report(username,file_id)
 
+    if report is None:
+        return None
+
     # Format output in headers
     for k in ["header_first", "header_second"]:
         for elem in report[k]:
